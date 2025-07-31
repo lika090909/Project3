@@ -9,7 +9,7 @@ module "ec2-instance_bastion" {
   instance_type          = var.instance_type
   key_name               = var.instance_keypair
   availability_zone      = element(module.vpc.azs, 0)
-  subnet_id              = element(module.vpc.private_subnets, 0)
+  subnet_id              = element(module.vpc.public_subnets, 0)
   vpc_security_group_ids = [module.security-group_bastion.security_group_id]
   create_eip             = false
   associate_public_ip_address = true
