@@ -6,7 +6,7 @@ module "security-group_database" {
   vpc_id = module.vpc.vpc_id
  
   # Ingress Rules & CIDR Blocks
-  ingress_rules = ["ssh-tcp"]
+  ingress_rules = ["ssh-tcp" , "mysql-tcp"]
   ingress_cidr_blocks = [module.vpc.vpc_cidr_block]
   
   # Egress Rule all-all open
