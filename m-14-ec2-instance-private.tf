@@ -13,6 +13,8 @@ module "ec2-instance_private_az1" {
   availability_zone      = element(module.vpc.azs, 0)
   subnet_id              = element(module.vpc.private_subnets, 0)
   vpc_security_group_ids = [module.security-group_private.security_group_id]
+  create_security_group = false
+
   
 
   user_data           = file("${path.module}/APP-1.sh")
@@ -64,6 +66,8 @@ module "ec2-instance_private_az2" {
   availability_zone      = element(module.vpc.azs, 1)
   subnet_id              = element(module.vpc.private_subnets, 1)
   vpc_security_group_ids = [module.security-group_private.security_group_id]
+  create_security_group = false
+
   
 
   user_data           = file("${path.module}/APP-1.sh")

@@ -15,7 +15,7 @@ module "ec2-instance_bastion-az1" {
   vpc_security_group_ids = [module.security-group_bastion.security_group_id]
   create_eip             = true
   #associate_public_ip_address = true
-  #create_security_group = false
+  create_security_group = false
 
   tags = local.common_tags
 }
@@ -37,7 +37,11 @@ module "ec2-instance_bastion-az2" {
   vpc_security_group_ids = [module.security-group_bastion.security_group_id]
   create_eip             = true
   #associate_public_ip_address = true
-  #create_security_group = false
+  create_security_group = false
+
+
 
   tags = local.common_tags
 }
+
+

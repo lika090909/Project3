@@ -11,9 +11,11 @@ module "security-group_bastion" {
   
   # Egress Rule - all-all open
   egress_rules = ["all-all"]
-  
+
+ 
   tags = local.common_tags
 
 }
+
 
 
