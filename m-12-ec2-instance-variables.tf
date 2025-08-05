@@ -4,12 +4,23 @@ variable "instance_type" {
   type = string 
 }
 
+# Keypair for bastion
 variable "instance_keypair" {
     description = "Ec2 Bastion SSH KEY"
     default = "devops"
     type = string
   
 }
+
+# Keypair for private ec2
+
+variable "private-ec2-keypair" {
+    description = "private ec2 keypair"
+    default = "private-ec2-key"
+    type = string
+  
+}
+
 
 # # RDS variables:  
 

@@ -9,7 +9,7 @@ module "ec2-instance_private_az1" {
 
   ami                    = data.aws_ami.amz-2023.id
   instance_type          = var.instance_type
-  key_name               = var.instance_keypair
+  key_name               = var.private-ec2-keypair
   availability_zone      = element(module.vpc.azs, 0)
   subnet_id              = element(module.vpc.private_subnets, 0)
   vpc_security_group_ids = [module.security-group_private.security_group_id]
@@ -62,7 +62,7 @@ module "ec2-instance_private_az2" {
 
   ami                    = data.aws_ami.amz-2023.id
   instance_type          = var.instance_type
-  key_name               = var.instance_keypair
+  key_name               = var.private-ec2-keypair
   availability_zone      = element(module.vpc.azs, 1)
   subnet_id              = element(module.vpc.private_subnets, 1)
   vpc_security_group_ids = [module.security-group_private.security_group_id]
