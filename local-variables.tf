@@ -9,3 +9,10 @@ locals {
     environment = local.environment
   }
 }
+
+locals {
+  ec2_private_names = {
+    "0" = "Private-AZ1"
+    "1" = "Private-AZ2"
+  }
+}
