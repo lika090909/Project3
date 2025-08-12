@@ -4,7 +4,7 @@ module "ec2-instance_private-app1" {
   source  = "terraform-aws-modules/ec2-instance/aws"
   version = "6.0.2"
   depends_on = [ module.vpc ]
-  name = "${var.environment}-EC2-APP1"
+  name = "${var.environment}-EC2-APP1-${element(module.vpc.azs, tonumber(each.key))}"
 
 
   ami                    = data.aws_ami.amz-2023.id
