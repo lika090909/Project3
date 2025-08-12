@@ -81,7 +81,7 @@ module "alb" {
            }]
           conditions = [{
             path_pattern = {
-              values = ["/welcome*"]
+              values = ["app1/welcome*"]
             }
            }]
         }
@@ -94,7 +94,7 @@ module "alb" {
            }]
           conditions = [{
             path_pattern = {
-              values = ["/welcome*"]
+              values = ["app2/welcome*"]
             }
            }]
         }
@@ -115,7 +115,7 @@ module "alb" {
       health_check = {
         enabled             = true
         interval            = 30
-        path                = "/app1/invite.html"
+        path                = "/app1/index.html"
         port                = 80
         healthy_threshold   = 3
         unhealthy_threshold = 3
@@ -137,7 +137,7 @@ module "alb" {
       health_check = {
         enabled             = true
         interval            = 30
-        path                = "/app2/movie-ranking.html"
+        path                = "/app2/index.html"
         port                = 80
         healthy_threshold   = 3
         unhealthy_threshold = 3
