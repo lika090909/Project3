@@ -15,18 +15,29 @@ output "ec2-instance_bastion-az1_arn" {
 
 
 
-output "ec2-instance_private" {
+output "ec2-instance_private-app1" {
   description = "The ID of the instance"
-  value       = [for m in values (module.ec2-instance_private): m.id]
+  value       = [for m in values (module.ec2-instance_private-app1): m.id]
 }
 
 
 
-output "ec2-instance_private_arn" {
+output "ec2-instance_private_arn-app1" {
   description = "The ID of the instance"
-  value       = [for m in values (module.ec2-instance_private): m.arn]
+  value       = [for m in values (module.ec2-instance_private-app1): m.arn]
 }
 
+
+
+output "ec2-instance_private-app2" {
+  description = "The ID of the instance"
+  value       = [for m in values (module.ec2-instance_private-app2): m.id]
+}
+
+output "ec2-instance_private_arn-app2" {
+  description = "The ID of the instance"
+  value       = [for m in values (module.ec2-instance_private-app2): m.arn]
+}
 
 
 # output "rds_endpoint" {

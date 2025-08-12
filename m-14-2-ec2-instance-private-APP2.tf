@@ -1,10 +1,10 @@
-# Private EC2s 
+# Private EC2s for APP2
 
-module "ec2-instance_private" {
+module "ec2-instance_private-app2" {
   source  = "terraform-aws-modules/ec2-instance/aws"
   version = "6.0.2"
   depends_on = [ module.vpc ]
-  name = "${var.environment}-EC2-${local.ec2_private_names[each.key]}"
+  name = "${var.environment}-EC2-APP2"
 
 
   ami                    = data.aws_ami.amz-2023.id
@@ -23,7 +23,7 @@ module "ec2-instance_private" {
 
   
 
-  user_data           = file("${path.module}/APP-1.sh")
+  user_data           = file("${path.module}/APP-2.sh")
   user_data_replace_on_change = true
 
   cpu_options = {

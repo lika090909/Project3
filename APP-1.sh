@@ -7,10 +7,10 @@ sudo yum install -y httpd wget
 sudo mkdir -p /var/www/html/app1
 
 # Download the HTML file as index.html inside /app1
-sudo wget -O /var/www/html/app1/index.html https://raw.githubusercontent.com/lika090909/Project3/main/birthday-invite.html
+sudo wget -O /var/www/html/app1/invite.html https://raw.githubusercontent.com/lika090909/Project3/main/birthday-invite.html
 
 # Create welcome.html directly in web root (for /welcome)
-echo '<h1>Welcome to My Website</h1>' | sudo tee /var/www/html/welcome
+echo '<h1>Welcome to My Website APP-1</h1>' | sudo tee /var/www/html/welcome
 
 # Restart Apache
 sudo systemctl enable httpd

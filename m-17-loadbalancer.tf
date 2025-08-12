@@ -32,7 +32,7 @@ module "alb" {
       }
 
       rules = {
-        app1-path = {
+        app1-path-rule = {
           priority = 10
           actions = [{
             type             = "forward"
@@ -45,8 +45,22 @@ module "alb" {
           }]
         }
 
+
+        app2-path-rule = {
+          priority = 25
+          actions = [{
+            type             = "forward"
+            target_group_key = "tg-2"
+          }]
+          conditions = [{
+            path_pattern = {
+              values = ["/app2*"]
+            }
+          }]
+        }
+
         ex-fixed-response = {
-          priority = 20
+          priority = 30
           actions = [{
             type         = "fixed-response"
             content_type = "text/plain"
@@ -59,11 +73,24 @@ module "alb" {
             }
           }]
         }
-        welcome-path = {
-           priority = 30
+        welcome-path-app1 = {
+           priority = 40
            actions = [{
             type  = "forward"
             target_group_key = "tg-1"  
+           }]
+          conditions = [{
+            path_pattern = {
+              values = ["/welcome*"]
+            }
+           }]
+        }
+
+        welcome-path-app2 = {
+           priority = 50
+           actions = [{
+            type  = "forward"
+            target_group_key = "tg-2"  
            }]
           conditions = [{
             path_pattern = {
@@ -88,7 +115,29 @@ module "alb" {
       health_check = {
         enabled             = true
         interval            = 30
-        path                = "/invite.html"
+        path                = "/app1/invite.html"
+        port                = 80
+        healthy_threshold   = 3
+        unhealthy_threshold = 3
+        timeout             = 6
+        protocol            = "HTTP"
+        matcher             = "200-399"
+      }
+    }
+
+
+    tg-2 = {
+      protocol                          = "HTTP"
+      port                              = 80
+      target_type                       = "instance"
+      deregistration_delay              = 10
+      load_balancing_cross_zone_enabled = false
+      create_attachment                 = false
+
+      health_check = {
+        enabled             = true
+        interval            = 30
+        path                = "/app2/movie-ranking.html"
         port                = 80
         healthy_threshold   = 3
         unhealthy_threshold = 3
@@ -104,7 +153,15 @@ module "alb" {
 
 resource "aws_lb_target_group_attachment" "tg_1" {
   target_group_arn = module.alb.target_groups["tg-1"].arn
-  for_each         = { for k, v in module.ec2-instance_private : k => v }
+  for_each         = { for k, v in module.ec2-instance_private-app1 : k => v }
+  target_id        = each.value.id  # your EC2 instance ID
+  port             = 80             # must match target group port
+}
+
+
+resource "aws_lb_target_group_attachment" "tg_2" {
+  target_group_arn = module.alb.target_groups["tg-2"].arn
+  for_each         = { for k, v in module.ec2-instance_private-app2 : k => v }
   target_id        = each.value.id  # your EC2 instance ID
   port             = 80             # must match target group port
 }
