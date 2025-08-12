@@ -13,3 +13,17 @@
 
 # }
 
+
+  data "aws_acm_certificate" "issued" {
+  domain   = "lalalalalalala7.com"
+  statuses = ["ISSUED"]
+}
+
+  output "aws_acm_certificate_arn" {
+  description = "zone id"
+  value = data.aws_acm_certificate.issued.arn
+  
+}
+
+
+

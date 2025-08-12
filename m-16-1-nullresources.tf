@@ -13,13 +13,14 @@ resource "null_resource" "bastion-connection" {
    # Passing the private ec2 instance key to the bastioncount 
 
   provisioner "file" {
-
+    
     source = "/Users/angelika/Downloads/private-ec2-key.pem"
     destination = "/tmp/private-ec2-key.pem"
     
   }
 
   # changing the permission of the ec2 private key from bastion /tmp
+  
   provisioner "remote-exec" {
     
     inline = [

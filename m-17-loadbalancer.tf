@@ -1,39 +1,77 @@
-
-
 module "alb" {
   source  = "terraform-aws-modules/alb/aws"
   version = "9.17.0"
-  name    = "${var.environment}-ALB"
-  vpc_id  = module.vpc.vpc_id
-  subnets = module.vpc.public_subnets
+
+  name            = "${var.environment}-ALB"
+  vpc_id          = module.vpc.vpc_id
+  subnets         = module.vpc.public_subnets
   security_groups = [module.alb_SG.security_group_id]
-
   enable_deletion_protection = false
-  create_security_group = false
-
-#   security_group_ingress_rules = {
-#     all_http = {
-#       from_port   = 80
-#       to_port     = 82
-#       ip_protocol = "tcp"
-#       description = "HTTP web traffic"
-#       cidr_ipv4   = "0.0.0.0/0"
-#     }
-#   }
-
-#   security_group_egress_rules = {
-#     all = {
-#       ip_protocol = "-1"
-#       cidr_ipv4   = module.vpc.vpc_cidr_block
-#     }
-#   }
+  create_security_group      = false
 
   listeners = {
-    http = {
+    http-https-redirect = {
       port     = 80
       protocol = "HTTP"
+      redirect = {
+        port        = "443"
+        protocol    = "HTTPS"
+        status_code = "HTTP_301"
+      }
+    }
+
+    listener-https = {
+      port            = 443
+      protocol        = "HTTPS"
+      ssl_policy      = "ELBSecurityPolicy-TLS13-1-2-Res-2021-06"
+      certificate_arn = data.aws_acm_certificate.issued.arn
+
+      # Default forward if no rule matches
       forward = {
         target_group_key = "tg-1"
+      }
+
+      rules = {
+        app1-path = {
+          priority = 10
+          actions = [{
+            type             = "forward"
+            target_group_key = "tg-1"
+          }]
+          conditions = [{
+            path_pattern = {
+              values = ["/app1*"]
+            }
+          }]
+        }
+
+        ex-fixed-response = {
+          priority = 20
+          actions = [{
+            type         = "fixed-response"
+            content_type = "text/plain"
+            status_code  = 200
+            message_body = "This is a fixed response"
+          }]
+          conditions = [{
+            path_pattern = {
+              values = ["/"]
+            }
+          }]
+        }
+        welcome-path = {
+           priority = 30
+           actions = [{
+            type  = "forward"
+            target_group_key = "tg-1"  
+           }]
+          conditions = [{
+            path_pattern = {
+              values = ["/welcome*"]
+            }
+           }]
+        }
+
       }
     }
   }
@@ -45,12 +83,12 @@ module "alb" {
       target_type                       = "instance"
       deregistration_delay              = 10
       load_balancing_cross_zone_enabled = false
-      create_attachment                 = false # <--- REQUIRED FOR EXTERNAL ATTACHMENTS
+      create_attachment                 = false
 
       health_check = {
         enabled             = true
         interval            = 30
-        path                = "/index.html"
+        path                = "/invite.html"
         port                = 80
         healthy_threshold   = 3
         unhealthy_threshold = 3
@@ -64,10 +102,9 @@ module "alb" {
   tags = local.common_tags
 }
 
-
 resource "aws_lb_target_group_attachment" "tg_1" {
   target_group_arn = module.alb.target_groups["tg-1"].arn
-  for_each = {for k, v in module.ec2-instance_private: k => v}
-  target_id        = each.value.id
-  port             = 80
+  for_each         = { for k, v in module.ec2-instance_private : k => v }
+  target_id        = each.value.id  # your EC2 instance ID
+  port             = 80             # must match target group port
 }
