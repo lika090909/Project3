@@ -24,3 +24,7 @@ data "aws_ami" "amz-2023" {
     values = [ "x86_64" ]
   }
 }
+
+
+
+

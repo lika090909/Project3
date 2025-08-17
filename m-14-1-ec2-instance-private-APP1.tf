@@ -20,9 +20,6 @@ module "ec2-instance_private-app1" {
   
   
   create_security_group = false
-
-  
-
   user_data           = file("${path.module}/APP-1.sh")
   user_data_replace_on_change = true
 
@@ -56,6 +53,6 @@ module "ec2-instance_private-app1" {
   
 
   tags = local.common_tags
-}
+ }
 
 
