@@ -9,6 +9,14 @@ resource "null_resource" "bastion-connection" {
     private_key = file("/Users/angelika/Downloads/devops.pem")
       
   }
+  
+    # optional wait before doing anything
+  provisioner "remote-exec" {
+    inline = [
+      "echo 'Waiting 15s for EC2 to settle...'",
+      "sleep 15"
+    ]
+  }
 
    # Passing the private ec2 instance key to the bastioncount 
 

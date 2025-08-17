@@ -73,36 +73,13 @@ module "alb" {
             }
           }]
         }
-        welcome-path-app1 = {
-           priority = 40
-           actions = [{
-            type  = "forward"
-            target_group_key = "tg-1"  
-           }]
-          conditions = [{
-            path_pattern = {
-              values = ["app1/welcome*"]
-            }
-           }]
-        }
-
-        welcome-path-app2 = {
-           priority = 50
-           actions = [{
-            type  = "forward"
-            target_group_key = "tg-2"  
-           }]
-          conditions = [{
-            path_pattern = {
-              values = ["app2/welcome*"]
-            }
-           }]
-        }
 
       }
     }
   }
 
+   # Target group TYPE attachment and a Health check
+   
   target_groups = {
     tg-1 = {
       protocol                          = "HTTP"
@@ -125,7 +102,7 @@ module "alb" {
       }
     }
 
-
+   # Target group TYPE attachment and a Health check
     tg-2 = {
       protocol                          = "HTTP"
       port                              = 80
