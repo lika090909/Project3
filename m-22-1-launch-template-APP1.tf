@@ -1,4 +1,4 @@
-resource "aws_launch_template" "myec2_launch_template" {
+resource "aws_launch_template" "myec2_launch_template-app1" {
   
   name = "${var.environment}-EC2-APP1"
 
@@ -50,6 +50,6 @@ resource "aws_launch_template" "myec2_launch_template" {
     enabled = true
   }
   tags = local.common_tags
-
   
 }
+

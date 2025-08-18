@@ -13,8 +13,8 @@ resource "null_resource" "bastion-connection" {
     # optional wait before doing anything
   provisioner "remote-exec" {
     inline = [
-      "echo 'Waiting 15s for EC2 to settle...'",
-      "sleep 15"
+      "echo 'Waiting 25s for EC2 to settle...'",
+      "sleep 25"
     ]
   }
 
