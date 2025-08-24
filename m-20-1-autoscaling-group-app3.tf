@@ -1,30 +1,31 @@
-module "autoscaling_app1" {
+module "autoscaling_app3" {
   source  = "terraform-aws-modules/autoscaling/aws"
   version = "9.0.1"
 
   name            = "${var.environment}-ASG-${each.value}"
   use_name_prefix = true
 
-  instance_name   = "${var.environment}-EC2-APP1-${each.value}"
+  instance_name   = "${var.environment}-EC2-APP3-${each.value}"
 
   for_each = toset(module.vpc.azs)
   vpc_zone_identifier = [
     module.vpc.private_subnets[index(module.vpc.azs, each.value)]
   ]
-
+  health_check_type         = "ELB"
+  health_check_grace_period = 300
   ignore_desired_capacity_changes = true
 
   min_size                  = 1
-  max_size                  = 2
+  max_size                  = 1
   desired_capacity          = 1
   wait_for_capacity_timeout = 0
   default_instance_warmup   = 300
-  health_check_type         = "EC2"
+  #health_check_type         = "EC2"
  #   vpc_zone_identifier       = module.vpc.private_subnets
   
    traffic_source_attachments = {
     alb = {
-      traffic_source_identifier = module.alb.target_groups["tg-1"].arn
+      traffic_source_identifier = module.alb.target_groups["tg-3"].arn
       traffic_source_type       = "elbv2" # default
     }
   }
@@ -71,15 +72,15 @@ module "autoscaling_app1" {
     }
     
     triggers = ["launch_template"] 
-
   }
 
+
    # Launch template
-  launch_template_id       = aws_launch_template.myec2_launch_template-app1.id
+  launch_template_id       = aws_launch_template.myec2_launch_template-app3.id
   create_launch_template = false
-
-  launch_template_version = tostring(aws_launch_template.myec2_launch_template-app1.latest_version) 
-
+  launch_template_version = tostring(aws_launch_template.myec2_launch_template-app3.latest_version) 
+  
+  
   tags = local.common_tags
 
 }

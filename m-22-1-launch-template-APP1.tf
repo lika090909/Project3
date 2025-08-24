@@ -6,6 +6,8 @@ resource "aws_launch_template" "myec2_launch_template-app1" {
   instance_type = var.instance_type
   key_name = var.private-ec2-keypair
   vpc_security_group_ids = [module.security-group_private.security_group_id]
+  
+  update_default_version = true 
 
   block_device_mappings {
     device_name = "/dev/sdf"
@@ -28,8 +30,8 @@ resource "aws_launch_template" "myec2_launch_template-app1" {
     cpu_credits = "standard"
   }
 
-  disable_api_stop        = true
-  disable_api_termination = true
+  disable_api_stop        = false
+  disable_api_termination = false
 
   ebs_optimized = true
 

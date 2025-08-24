@@ -1,8 +1,16 @@
-resource "aws_launch_template" "myec2_launch_template-app2" {
+resource "aws_launch_template" "myec2_launch_template-app3" {
   
-  name = "${var.environment}-EC2-APP2"
+  name = "${var.environment}-EC2-APP3"
 
-  user_data           = filebase64("${path.module}/APP-2.sh")
+user_data = base64encode(replace(templatefile("${path.module}/APP-3.sh", {
+  #db_host                = aws_db_instance.rds_database.address
+  db_endpoint = "${aws_db_instance.rds_database.address}:${aws_db_instance.rds_database.port}"
+  db_name                = var.db_name
+  db_username            = var.db_username
+  db_password            = var.db_password
+  #spring_datasource_url  = "jdbc:mysql://${aws_db_instance.rds_database.address}:3306/${var.db_name}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC"
+  }), "\r\n", "\n"))
+
   instance_type = var.instance_type
   key_name = var.private-ec2-keypair
   vpc_security_group_ids = [module.security-group_private.security_group_id]
@@ -30,7 +38,7 @@ resource "aws_launch_template" "myec2_launch_template-app2" {
     cpu_credits = "standard"
   }
 
-  disable_api_stop        =  false
+  disable_api_stop        = false
   disable_api_termination = false
 
   ebs_optimized = true

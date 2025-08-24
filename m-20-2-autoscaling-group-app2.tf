@@ -2,10 +2,10 @@ module "autoscaling_app2" {
   source  = "terraform-aws-modules/autoscaling/aws"
   version = "9.0.1"
 
-  name            = "${var.environment}-ASG"
+  name            = "${var.environment}-ASG-${each.value}"
   use_name_prefix = true
 
-  instance_name   = "${var.environment}-EC2-APP2"
+  instance_name   = "${var.environment}-EC2-APP2-${each.value}"
 
   for_each = toset(module.vpc.azs)
   vpc_zone_identifier = [
@@ -70,12 +70,13 @@ module "autoscaling_app2" {
     #   }
     }
     
-
+    triggers = ["launch_template"] 
   }
 
    # Launch template
   launch_template_id       = aws_launch_template.myec2_launch_template-app2.id
   create_launch_template = false
+  launch_template_version = tostring(aws_launch_template.myec2_launch_template-app2.latest_version)  
 
   tags = local.common_tags
 

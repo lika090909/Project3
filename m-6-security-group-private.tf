@@ -7,6 +7,18 @@ module "security-group_private" {
  
   # Ingress Rules & CIDR Blocks
   ingress_rules = ["ssh-tcp" , "http-80-tcp"]
+
+  # Custom Port Rule /Opening port 8080 for APP-3.sh 
+
+  ingress_with_cidr_blocks = [
+    {
+      from_port   = 8080
+      to_port     = 8080
+      protocol    = "tcp"
+      cidr_blocks = "10.0.0.0/16"
+      description = "Allow 8080"
+    }
+  ]
   ingress_cidr_blocks = [module.vpc.vpc_cidr_block]
   
   # Egress Rule all-all open

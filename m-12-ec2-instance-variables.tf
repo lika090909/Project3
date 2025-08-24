@@ -60,16 +60,32 @@ variable "storage_type" {
   
 }
 
-variable "username" {
+variable "db_username" {
   description = "RDS DB username"
   default = "devops"
   type = string 
   
 }
 
-variable "password" {
+variable "db_password" {
   description = "RDS DB password"
   default = "password123"
   type = string 
   
 }
+
+variable "instance_identifier" {
+   description = "RDS identifier"
+   default = "rds-database"
+   type = string 
+  
+}
+
+variable "db_name" {
+  description = "DB name"
+   default = "cat"
+   type = string 
+  
+}
+
+

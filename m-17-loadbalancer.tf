@@ -19,6 +19,18 @@ module "alb" {
         status_code = "HTTP_301"
       }
     }
+    
+    # Here we are just opening the port 8080, if we want to connect like ALB_DNS:8080 
+    
+    java-https-redirect = {
+      port     = 8080
+     protocol = "HTTP"
+     redirect = {
+     port        = "443"
+     protocol    = "HTTPS"
+     status_code = "HTTP_301"
+  }
+}
 
     listener-https = {
       port            = 443
@@ -59,20 +71,34 @@ module "alb" {
           }]
         }
 
-        ex-fixed-response = {
-          priority = 30
+        app3-path-rule = {
+          priority = 27
           actions = [{
-            type         = "fixed-response"
-            content_type = "text/plain"
-            status_code  = 200
-            message_body = "This is a fixed response"
+            type             = "forward"
+            target_group_key = "tg-3"
           }]
           conditions = [{
             path_pattern = {
-              values = ["/"]
+              values = ["/*"]
             }
           }]
         }
+
+        # ex-fixed-response = {
+        #   priority = 30
+        #   actions = [{
+        #     type         = "fixed-response"
+        #     content_type = "text/plain"
+        #     status_code  = 200
+        #     message_body = "This is a fixed response"
+        #   }]
+        #   conditions = [{
+        #     path_pattern = {
+        #       values = ["/"]
+        #     }
+        #   }]
+        # }
+
 
       }
     }
@@ -123,22 +149,43 @@ module "alb" {
         matcher             = "200-399"
       }
     }
+
+    tg-3 = {
+      protocol                          = "HTTP"
+      port                              = 8080
+      target_type                       = "instance"
+      deregistration_delay              = 10
+      load_balancing_cross_zone_enabled = false
+      create_attachment                 = false
+
+      health_check = {
+        enabled             = true
+        interval            = 30
+        path                = "/login"
+        port                = 8080
+        healthy_threshold   = 3
+        unhealthy_threshold = 3
+        timeout             = 6
+        protocol            = "HTTP"
+        matcher             = "200-399"
+      }
+    }
   }
 
   tags = local.common_tags
 }
 
-resource "aws_lb_target_group_attachment" "tg_1" {
-  target_group_arn = module.alb.target_groups["tg-1"].arn
-  for_each         = { for k, v in module.ec2-instance_private-app1 : k => v }
-  target_id        = each.value.id  # your EC2 instance ID
-  port             = 80             # must match target group port
-}
+# resource "aws_lb_target_group_attachment" "tg_1" {
+#   target_group_arn = module.alb.target_groups["tg-1"].arn
+#   for_each         = { for k, v in module.ec2-instance_private-app1 : k => v }
+#   target_id        = each.value.id  # your EC2 instance ID
+#   port             = 80             # must match target group port
+# }
 
 
-resource "aws_lb_target_group_attachment" "tg_2" {
-  target_group_arn = module.alb.target_groups["tg-2"].arn
-  for_each         = { for k, v in module.ec2-instance_private-app2 : k => v }
-  target_id        = each.value.id  # your EC2 instance ID
-  port             = 80             # must match target group port
-}
+# resource "aws_lb_target_group_attachment" "tg_2" {
+#   target_group_arn = module.alb.target_groups["tg-2"].arn
+#   for_each         = { for k, v in module.ec2-instance_private-app2 : k => v }
+#   target_id        = each.value.id  # your EC2 instance ID
+#   port             = 80             # must match target group port
+# }
