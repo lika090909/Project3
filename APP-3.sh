@@ -18,10 +18,10 @@ for i in {1..5}; do
 done
 
 
-export DB_ENDPOINT="${db_endpoint}"   
-export DB_NAME="${db_name}"
-export DB_USERNAME="${db_username}"
-export DB_PASSWORD="${db_password}"
+export DB_ENDPOINT=${db_endpoint}  
+export DB_NAME=webappdb
+export DB_USERNAME=dbadmin
+export DB_PASSWORD=dbpassword11
 
 
 # Spring Boot datasource (endpoint already has :port; require SSL)

@@ -15,9 +15,9 @@ module "autoscaling_app3" {
   health_check_grace_period = 300
   ignore_desired_capacity_changes = true
 
-  min_size                  = 0
-  max_size                  = 0
-  desired_capacity          = 0
+  min_size                  = 1
+  max_size                  = 1
+  desired_capacity          = 1
   wait_for_capacity_timeout = 0
   default_instance_warmup   = 300
   #health_check_type         = "EC2"
