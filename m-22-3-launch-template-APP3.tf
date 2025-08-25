@@ -1,14 +1,13 @@
+
 resource "aws_launch_template" "myec2_launch_template-app3" {
   
   name = "${var.environment}-EC2-APP3"
 
 user_data = base64encode(replace(templatefile("${path.module}/APP-3.sh", {
-  #db_host                = aws_db_instance.rds_database.address
   db_endpoint = "${aws_db_instance.rds_database.address}:${aws_db_instance.rds_database.port}"
   db_name                = var.db_name
   db_username            = var.db_username
   db_password            = var.db_password
-  #spring_datasource_url  = "jdbc:mysql://${aws_db_instance.rds_database.address}:3306/${var.db_name}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC"
   }), "\r\n", "\n"))
 
   instance_type = var.instance_type

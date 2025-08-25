@@ -4,7 +4,7 @@ exec > >(tee -a /var/log/user-data.log) 2>&1
 
 yum -y update
 yum -y install wget
-yum -y install java-17-openjdk || yum -y install java-17-amazon-corretto
+yum -y install java-11-amazon-corretto
 sudo dnf -y install mariadb105
 
 
@@ -18,10 +18,11 @@ for i in {1..5}; do
 done
 
 
-export DB_ENDPOINT="${db_endpoint}"    
+export DB_ENDPOINT="${db_endpoint}"   
 export DB_NAME="${db_name}"
 export DB_USERNAME="${db_username}"
 export DB_PASSWORD="${db_password}"
+
 
 # Spring Boot datasource (endpoint already has :port; require SSL)
 export SPRING_DATASOURCE_URL="jdbc:mysql://$${DB_ENDPOINT}/$${DB_NAME}?sslMode=REQUIRED&serverTimezone=UTC"
