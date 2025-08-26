@@ -3,7 +3,7 @@ set -euxo pipefail
 exec > >(tee -a /var/log/user-data.log) 2>&1
 
 yum -y update
-yum -y install wgetclear
+yum -y install wget
 yum -y install java-11-amazon-corretto
 sudo dnf -y install mariadb105
 
@@ -18,10 +18,27 @@ for i in {1..5}; do
 done
 
 
-export DB_ENDPOINT=${db_endpoint}  
-export DB_NAME=webappdb
-export DB_USERNAME=dbadmin
-export DB_PASSWORD=dbpassword11
+TOKEN=$(curl -sS -X PUT "http://169.254.169.254/latest/api/token" \
+  -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
+REGION=$(curl -sS -H "X-aws-ec2-metadata-token: $TOKEN" \
+  http://169.254.169.254/latest/dynamic/instance-identity/document | jq -r .region)
+
+SECRET_ID="arn:aws:secretsmanager:us-east-1:058264231384:secret:dev/database_creds-SKaLIi"
+
+for i in {1..6}; do
+  SECRET_JSON=$(aws secretsmanager get-secret-value \
+    --region "$REGION" \
+    --secret-id "$SECRET_ID" \
+    --query SecretString --output text 2>/dev/null) && break
+  echo "Waiting for Secrets Manager…"
+  sleep 5
+done
+
+  
+export DB_ENDPOINT=$(echo "$SECRET_JSON" | jq -r .host)
+export DB_NAME=$(echo "$SECRET_JSON" | jq -r .dbname)
+export DB_USERNAME=$(echo "$SECRET_JSON" | jq -r .username)
+export DB_PASSWORD=$(echo "$SECRET_JSON" | jq -r .password)
 
 
 # Spring Boot datasource (endpoint already has :port; require SSL)
