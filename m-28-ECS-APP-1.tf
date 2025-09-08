@@ -1,4 +1,4 @@
-module "ecs" {
+module "ecs-app1" {
   source  = "terraform-aws-modules/ecs/aws"
   version = ">= 6.3.0"
 
@@ -11,7 +11,7 @@ module "ecs" {
   }
 
   services = {
-    ecsdemo-frontend = {
+    app1-service = {
       cpu           = 512
       memory        = 1024
       desired_count = 1
