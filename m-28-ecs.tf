@@ -21,6 +21,12 @@ module "ecs" {
       security_group_ids = [module.security-group_bastion.security_group_id]
       assign_public_ip   = true   # keep false if you have a NAT; true only in public subnets
       create_security_group = false
+
+      runtime_platform = {
+      cpu_architecture        = "ARM64"
+      operating_system_family = "LINUX"
+    }
+
       container_definitions = {
         app1 = {
           cpu       = 512
@@ -37,13 +43,13 @@ module "ecs" {
             }
           ]
 
-          # healthCheck = {
-          #   command     = ["CMD-SHELL", "curl -sf http://localhost:80/app1 || exit 1"]
-          #   interval    = 30
-          #   timeout     = 5
-          #   retries     = 3
-          #   startPeriod = 10
-          # }
+          healthCheck = {
+            command     = ["CMD-SHELL", "curl -sf http://localhost:80/app1 || exit 1"]
+            interval    = 30
+            timeout     = 5
+            retries     = 3
+            startPeriod = 10
+          }
 
           cloudwatch_log_group_retention_in_days = 30
         }
