@@ -23,17 +23,19 @@ module "ecs" {
       create_security_group = false
 
       runtime_platform = {
-      cpu_architecture        = "ARM64"
+      cpu_architecture        = "X86_64"
       operating_system_family = "LINUX"
-    }
+      }
 
       container_definitions = {
         app1 = {
           cpu       = 512
           memory    = 1024
           essential = true
-          image     = "lika090909/app1-amd64:latest"
-
+          image     = "lika090909/app1:v1.0.8"
+          
+          readonlyRootFilesystem = false
+           
           portMappings = [
             {
               name          = "app1"
@@ -44,11 +46,11 @@ module "ecs" {
           ]
 
           healthCheck = {
-            command     = ["CMD-SHELL", "curl -sf http://localhost:80/app1 || exit 1"]
+            command     = ["CMD-SHELL", "curl -sf http://localhost:80/ || exit 1"]
             interval    = 30
             timeout     = 5
             retries     = 3
-            startPeriod = 10
+            startPeriod = 30
           }
 
           cloudwatch_log_group_retention_in_days = 30

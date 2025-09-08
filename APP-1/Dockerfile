@@ -1,19 +1,19 @@
-
 FROM ubuntu:latest
+ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt update -y && \
-    apt install -y apache2 && \
-    mkdir -p /var/www/html/app1 && \
-    sed -i 's|/var/www/html|/var/www/html/app1|' /etc/apache2/sites-available/000-default.conf && \
-    a2enmod rewrite
+RUN apt-get update -y && \
+    apt-get install -y apache2 curl && \
+    mkdir -p /var/www/html/app1 /var/run/apache2 /var/lock/apache2 && \
+    rm -rf /var/lib/apt/lists/*
+
+# Redirect Apache logs to stdout/stderr
+RUN ln -sf /dev/stdout /var/log/apache2/access.log \
+ && ln -sf /dev/stderr /var/log/apache2/error.log
 
 WORKDIR /var/www/html/app1
 
-COPY birthday-invite.html .
-COPY welcome .
+COPY birthday-invite.html /var/www/html/app1/index.html
+COPY welcome /var/www/html/app1/welcome
 
 EXPOSE 80
 CMD ["apache2ctl", "-D", "FOREGROUND"]
-
-
-docker
