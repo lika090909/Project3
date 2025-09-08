@@ -16,3 +16,4 @@ EXPOSE 80
 CMD ["apache2ctl", "-D", "FOREGROUND"]
 
 
+docker
