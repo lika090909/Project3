@@ -11,56 +11,61 @@ module "ecs-app1" {
   }
 
   services = {
-    app1-service = {
-      cpu           = 512
-      memory        = 1024
-      desired_count = 1
+  app1-service = {
+    cpu           = 512
+    memory        = 1024
+    desired_count = 1
 
-      # ✅ Use these (module expects them):
-      subnet_ids         = module.vpc.public_subnets
-      security_group_ids = [module.security-group_bastion.security_group_id]
-      assign_public_ip   = true   # keep false if you have a NAT; true only in public subnets
-      create_security_group = false
+    subnet_ids            = module.vpc.public_subnets
+    security_group_ids = [aws_security_group.ecs_task_sg.id]
+    assign_public_ip      = true
+    create_security_group = false
 
-      runtime_platform = {
+    runtime_platform = {
       cpu_architecture        = "X86_64"
       operating_system_family = "LINUX"
-      }
+    }
 
-      container_definitions = {
-        app1 = {
-          cpu       = 512
-          memory    = 1024
-          essential = true
-          image     = "lika090909/app1:v1.0.8"
-          
-          readonlyRootFilesystem = false
-           
-          portMappings = [
-            {
-              name          = "app1"
-              containerPort = 80
-              hostPort      = 80
-              protocol      = "tcp"
-            }
-          ]
+    container_definitions = {
+      app1 = {
+        cpu       = 512
+        memory    = 1024
+        essential = true
+        image     = "lika090909/app1:v1.0.8"
+        readonlyRootFilesystem = false
 
-          healthCheck = {
-            command     = ["CMD-SHELL", "curl -sf http://localhost:80/ || exit 1"]
-            interval    = 30
-            timeout     = 5
-            retries     = 3
-            startPeriod = 30
+        portMappings = [
+          {
+            name          = "app1"
+            containerPort = 80
+            hostPort      = 80
+            protocol      = "tcp"
           }
+        ]
 
-          cloudwatch_log_group_retention_in_days = 30
+        healthCheck = {
+          command     = ["CMD-SHELL", "curl -sf http://localhost:80/ || exit 1"]
+          interval    = 30
+          timeout     = 5
+          retries     = 3
+          startPeriod = 30
         }
+
+        cloudwatch_log_group_retention_in_days = 30
       }
     }
+
+    # ⬇️ FIXED: map, and correct module name
+    load_balancer = {
+      app1 = {
+        target_group_arn = module.alb-ecs.target_groups["tg-1"].arn
+        container_name   = "app1"
+        container_port   = 80
+      }
+    }
+
+    health_check_grace_period_seconds = 60
   }
+}
 
- 
-  
-
-  tags = local.common_tags
 }

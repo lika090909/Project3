@@ -18,7 +18,7 @@ module "ecs-app2" {
 
       # ✅ Use these (module expects them):
       subnet_ids         = module.vpc.public_subnets
-      security_group_ids = [module.security-group_bastion.security_group_id]
+      security_group_ids = [aws_security_group.ecs_task_sg.id]
       assign_public_ip   = true   # keep false if you have a NAT; true only in public subnets
       create_security_group = false
 
@@ -28,7 +28,7 @@ module "ecs-app2" {
       }
 
       container_definitions = {
-        app1 = {
+        app2 = {
           cpu       = 512
           memory    = 1024
           essential = true
@@ -56,6 +56,16 @@ module "ecs-app2" {
           cloudwatch_log_group_retention_in_days = 30
         }
       }
+
+     # ⬇️ FIXED: map, and correct module name
+    load_balancer = {
+
+      app2 = {
+        target_group_arn = module.alb-ecs.target_groups["tg-2"].arn
+        container_name   = "app2"
+        container_port   = 80
+      }
+    }
     }
   }
 

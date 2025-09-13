@@ -1,8 +1,8 @@
-module "alb" {
+module "alb-ecs" {
   source  = "terraform-aws-modules/alb/aws"
   version = "9.17.0"
 
-  name            = "${var.environment}-ALB"
+  name            = "${var.environment}-ALB-ECS"
   vpc_id          = module.vpc.vpc_id
   subnets         = module.vpc.public_subnets
   security_groups = [module.alb_SG.security_group_id]
@@ -110,7 +110,7 @@ module "alb" {
     tg-1 = {
       protocol                          = "HTTP"
       port                              = 80
-      target_type                       = "instance"
+      target_type                       = "ip"
       deregistration_delay              = 10
       load_balancing_cross_zone_enabled = false
       create_attachment                 = false
@@ -118,7 +118,7 @@ module "alb" {
       health_check = {
         enabled             = true
         interval            = 30
-        path                = "/app1/index.html"
+        path                = "/app1/"
         port                = 80
         healthy_threshold   = 3
         unhealthy_threshold = 3
@@ -132,7 +132,7 @@ module "alb" {
     tg-2 = {
       protocol                          = "HTTP"
       port                              = 80
-      target_type                       = "instance"
+      target_type                       = "ip"
       deregistration_delay              = 10
       load_balancing_cross_zone_enabled = false
       create_attachment                 = false
@@ -140,7 +140,7 @@ module "alb" {
       health_check = {
         enabled             = true
         interval            = 30
-        path                = "/app2/index.html"
+        path                = "/app2/"
         port                = 80
         healthy_threshold   = 3
         unhealthy_threshold = 3
@@ -153,7 +153,7 @@ module "alb" {
     tg-3 = {
       protocol                          = "HTTP"
       port                              = 8080
-      target_type                       = "instance"
+      target_type                       = "ip"
       deregistration_delay              = 10
       load_balancing_cross_zone_enabled = false
       create_attachment                 = false

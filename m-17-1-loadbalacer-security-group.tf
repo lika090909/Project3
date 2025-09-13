@@ -10,7 +10,7 @@ module "alb_SG" {
   ingress_rules = ["http-80-tcp" , "https-443-tcp"]
   ingress_cidr_blocks = ["0.0.0.0/0"]
 
-  # Enabling port 81 (custom port)
+  # Enabling port 81 (if we want to connect to ALB on port 81 MOT applicable for this project)
 
    ingress_with_cidr_blocks = [
     {
