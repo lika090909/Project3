@@ -1,4 +1,4 @@
-module "alb_ecs" {
+module "albecs" {
   source  = "terraform-aws-modules/alb/aws"
   version = "9.17.0"
 
@@ -40,7 +40,7 @@ module "alb_ecs" {
 
       # Default forward if no rule matches
       forward = {
-        target_group_key = "tg-1"
+        target_group_key = "tg-3"
       }
 
       rules = {

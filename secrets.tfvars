@@ -1,10 +1,10 @@
-# db_username = "devops"
+db_username = "devops"
 
-# db_instance_identifier = "rds-database"
+db_instance_identifier = "rds-database"
 
-# db_name = "cat"
+db_name = "cat"
 
-# db_password = "password123"
+db_password = "password123"
 
 
 

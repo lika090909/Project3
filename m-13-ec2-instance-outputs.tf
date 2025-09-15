@@ -40,8 +40,8 @@
 # # }
 
 
-# output "rds_endpoint" {
-#   value = aws_db_instance.rds_database.endpoint
-# }
+output "rds_endpoint" {
+  value = aws_db_instance.rds_database.endpoint
+}
 
 
