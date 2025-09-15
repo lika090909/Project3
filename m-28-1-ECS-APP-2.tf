@@ -2,7 +2,7 @@ module "ecs_app2" {
   source  = "terraform-aws-modules/ecs/aws"
   version = ">= 6.3.0"
 
-  depends_on   = [module.vpc]
+  depends_on = [module.vpc]
   cluster_name = "app2"
   
 
@@ -17,9 +17,9 @@ module "ecs_app2" {
       desired_count = 1
 
       # ✅ Use these (module expects them):
-      subnet_ids         = module.vpc.public_subnets
+      subnet_ids         = module.vpc.private_subnets
       security_group_ids = [aws_security_group.ecs_task_sg.id]
-      assign_public_ip   = true   # keep false if you have a NAT; true only in public subnets
+      assign_public_ip   = false   # keep false if you have a NAT; true only in public subnets
       create_security_group = false
 
       runtime_platform = {
@@ -58,7 +58,7 @@ module "ecs_app2" {
       }
 
      # ⬇️ FIXED: map, and correct module name
-    load_balancer = {
+    load_balancers = {
 
       app2 = {
         target_group_arn = module.alb_ecs.target_groups["tg-2"].arn

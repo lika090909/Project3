@@ -22,3 +22,4 @@ variable "domain_name" {
     default  = "www.lalalalalalala7.com"
     type = string
 }
+
