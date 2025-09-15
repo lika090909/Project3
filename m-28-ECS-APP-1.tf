@@ -1,4 +1,4 @@
-module "ecs-app1" {
+module "ecs_app1" {
   source  = "terraform-aws-modules/ecs/aws"
   version = ">= 6.3.0"
 
@@ -58,7 +58,7 @@ module "ecs-app1" {
     # ⬇️ FIXED: map, and correct module name
     load_balancer = {
       app1 = {
-        target_group_arn = module.alb-ecs.target_groups["tg-1"].arn
+        target_group_arn = module.alb_ecs.target_groups["tg-1"].arn
         container_name   = "app1"
         container_port   = 80
       }

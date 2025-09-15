@@ -3,8 +3,8 @@ resource "aws_route53_record" "R53_registration_with_www" {
   name    = var.domain_name
   type    = "A"
   alias {
-    name                   = module.alb-ecs.dns_name
-    zone_id                = module.alb-ecs.zone_id
+    name                   = module.alb_ecs.dns_name
+    zone_id                = module.alb_ecs.zone_id
     evaluate_target_health = true
   }
 }
@@ -15,8 +15,8 @@ resource "aws_route53_record" "R53_registration_apex" {
   name    = ""        # empty string means the root domain (apex)
   type    = "A"
   alias {
-    name                   = module.alb-ecs.dns_name
-    zone_id                = module.alb-ecs.zone_id
+    name                   = module.alb_ecs.dns_name
+    zone_id                = module.alb_ecs.zone_id
     evaluate_target_health = true
   }
 }

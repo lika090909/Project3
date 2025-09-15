@@ -1,4 +1,4 @@
-module "ecs-app2" {
+module "ecs_app2" {
   source  = "terraform-aws-modules/ecs/aws"
   version = ">= 6.3.0"
 
@@ -61,7 +61,7 @@ module "ecs-app2" {
     load_balancer = {
 
       app2 = {
-        target_group_arn = module.alb-ecs.target_groups["tg-2"].arn
+        target_group_arn = module.alb_ecs.target_groups["tg-2"].arn
         container_name   = "app2"
         container_port   = 80
       }
