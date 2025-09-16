@@ -1,8 +1,8 @@
 module "ecs_app2" {
   source  = "terraform-aws-modules/ecs/aws"
-  version = ">= 6.3.0"
+  version = "6.3.0"
 
-  depends_on = [module.vpc]
+  depends_on = [module.vpc, module.alb_ecs]
   cluster_name = "app2"
   
 
@@ -46,7 +46,7 @@ module "ecs_app2" {
           ]
 
           healthCheck = {
-            command     = ["CMD-SHELL", "curl -sf http://localhost:80/ || exit 1"]
+            command     = ["CMD-SHELL", "curl -sf http://localhost:80/app2/ || exit 1"]
             interval    = 30
             timeout     = 5
             retries     = 3
@@ -58,8 +58,16 @@ module "ecs_app2" {
       }
 
      # ⬇️ FIXED: map, and correct module name
-    load_balancers = {
+    # load_balancers = {
 
+    #   app2 = {
+    #     target_group_arn = module.alb_ecs.target_groups["tg-2"].arn
+    #     container_name   = "app2"
+    #     container_port   = 80
+    #   }
+    # }
+
+    load_balancers = {
       app2 = {
         target_group_arn = module.alb_ecs.target_groups["tg-2"].arn
         container_name   = "app2"

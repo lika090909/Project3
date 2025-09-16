@@ -79,7 +79,7 @@ module "alb_ecs" {
           }]
           conditions = [{
             path_pattern = {
-              values = ["/app3/*"]
+              values = ["/"]
             }
           }]
         }
@@ -118,7 +118,7 @@ module "alb_ecs" {
       health_check = {
         enabled             = true
         interval            = 30
-        path                = "/app1/"
+        path                = "/app1"
         port                = 80
         healthy_threshold   = 3
         unhealthy_threshold = 3
@@ -140,7 +140,7 @@ module "alb_ecs" {
       health_check = {
         enabled             = true
         interval            = 30
-        path                = "/app2/"
+        path                = "/app2"
         port                = 80
         healthy_threshold   = 3
         unhealthy_threshold = 3
@@ -161,7 +161,7 @@ module "alb_ecs" {
       health_check = {
         enabled             = true
         interval            = 30
-        path                = "/"
+        path                = "/login"
         port                = 8080
         healthy_threshold   = 3
         unhealthy_threshold = 3

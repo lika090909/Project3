@@ -1,8 +1,8 @@
 module "ecs_app3" {
   source  = "terraform-aws-modules/ecs/aws"
-  version = ">= 6.3.0"
+  version = "6.3.0"
 
-  depends_on   = [module.vpc]
+  depends_on   = [module.vpc, module.alb_ecs]
   cluster_name = "app3"
 
   default_capacity_provider_strategy = { FARGATE = { weight = 100, base = 1 } }
@@ -81,11 +81,13 @@ module "ecs_app3" {
         }
       }
 
-      load_balancers = [{
+      load_balancers = {
+      app3 = {
         target_group_arn = module.alb_ecs.target_groups["tg-3"].arn
         container_name   = "app3"
         container_port   = 8080
-      }]
+      }
+    }
     }
   }
 }
