@@ -46,14 +46,18 @@ module "ecs_app3" {
           }]
           
          
+          # environment = [
+          #  { name = "DB_ENDPOINT", value = local.db.host },
+          #  { name = "DB_NAME",     value = local.db.dbname },
+          #  { name = "DB_USERNAME", value = local.db.username },
+          #  { name = "DB_PASSWORD", value = local.db.password },
+          #  { name = "DB_PORT",     value = tostring(local.db.port) }, # optional; defaults to 3306 in script
+          #  ]
+          
           environment = [
-           { name = "DB_ENDPOINT", value = local.db.host },
-           { name = "DB_NAME",     value = local.db.dbname },
-           { name = "DB_USERNAME", value = local.db.username },
-           { name = "DB_PASSWORD", value = local.db.password },
-           { name = "DB_PORT",     value = tostring(local.db.port) }, # optional; defaults to 3306 in script
-           ]
-
+            { name = "SECRET_ID",  value = data.aws_secretsmanager_secret.db.name },  # or use the ARN if you prefer
+            { name = "AWS_REGION", value = "us-east-1" }                              # your region
+          ]
 
           healthCheck = {
             command     = ["CMD-SHELL", "curl -sf http://localhost:8080/login || exit 1"]

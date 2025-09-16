@@ -1,4 +1,4 @@
-module "albecs" {
+module "alb_ecs" {
   source  = "terraform-aws-modules/alb/aws"
   version = "9.17.0"
 
@@ -79,7 +79,7 @@ module "albecs" {
           }]
           conditions = [{
             path_pattern = {
-              values = ["/*"]
+              values = ["/app3/*"]
             }
           }]
         }
@@ -161,7 +161,7 @@ module "albecs" {
       health_check = {
         enabled             = true
         interval            = 30
-        path                = "/login"
+        path                = "/"
         port                = 8080
         healthy_threshold   = 3
         unhealthy_threshold = 3

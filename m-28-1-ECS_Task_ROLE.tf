@@ -28,7 +28,3 @@ resource "aws_iam_role_policy_attachment" "app3_task_attach_secrets" {
 }
 
 
-resource "aws_iam_role_policy_attachment" "app3_exec_logs" {
-  role       = aws_iam_role.app3_exec_role.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
-}
