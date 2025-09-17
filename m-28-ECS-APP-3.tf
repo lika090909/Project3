@@ -12,6 +12,9 @@
 #       cpu                  = 512
 #       memory               = 1024
 #       desired_count        = 1
+        # deployment_minimum_healthy_percent = 0
+        # deployment_maximum_percent         = 200
+
 #       subnet_ids           = module.vpc.private_subnets
 #       security_group_ids   = [aws_security_group.ecs_task_sg.id]
 #       assign_public_ip     = false
