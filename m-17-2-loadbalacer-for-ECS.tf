@@ -10,7 +10,7 @@ module "alb_ecs" {
   create_security_group      = false
 
   listeners = {
-    http-https-redirect = {
+    http = {
       port     = 80
       protocol = "HTTP"
       redirect = {
@@ -40,7 +40,7 @@ module "alb_ecs" {
 
       # Default forward if no rule matches
       forward = {
-        target_group_key = "tg-3"
+        target_group_key = "tg-1"
       }
 
       rules = {
@@ -79,7 +79,7 @@ module "alb_ecs" {
           }]
           conditions = [{
             path_pattern = {
-              values = ["/"]
+              values = ["/app3/*"]
             }
           }]
         }
@@ -118,7 +118,7 @@ module "alb_ecs" {
       health_check = {
         enabled             = true
         interval            = 30
-        path                = "/app1"
+        path                = "/app1/"
         port                = 80
         healthy_threshold   = 3
         unhealthy_threshold = 3
@@ -140,7 +140,7 @@ module "alb_ecs" {
       health_check = {
         enabled             = true
         interval            = 30
-        path                = "/app2"
+        path                = "/app2/"
         port                = 80
         healthy_threshold   = 3
         unhealthy_threshold = 3
@@ -175,17 +175,17 @@ module "alb_ecs" {
   tags = local.common_tags
 }
 
-# resource "aws_lb_target_group_attachment" "tg_1" {
-#   target_group_arn = module.alb.target_groups["tg-1"].arn
-#   for_each         = { for k, v in module.ec2-instance_private-app1 : k => v }
-#   target_id        = each.value.id  # your EC2 instance ID
-#   port             = 80             # must match target group port
-# }
+# # resource "aws_lb_target_group_attachment" "tg_1" {
+# #   target_group_arn = module.alb.target_groups["tg-1"].arn
+# #   for_each         = { for k, v in module.ec2-instance_private-app1 : k => v }
+# #   target_id        = each.value.id  # your EC2 instance ID
+# #   port             = 80             # must match target group port
+# # }
 
 
-# resource "aws_lb_target_group_attachment" "tg_2" {
-#   target_group_arn = module.alb.target_groups["tg-2"].arn
-#   for_each         = { for k, v in module.ec2-instance_private-app2 : k => v }
-#   target_id        = each.value.id  # your EC2 instance ID
-#   port             = 80             # must match target group port
-# }
+# # resource "aws_lb_target_group_attachment" "tg_2" {
+# #   target_group_arn = module.alb.target_groups["tg-2"].arn
+# #   for_each         = { for k, v in module.ec2-instance_private-app2 : k => v }
+# #   target_id        = each.value.id  # your EC2 instance ID
+# #   port             = 80             # must match target group port
+# # }
