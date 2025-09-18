@@ -40,7 +40,7 @@ module "alb_ecs" {
 
       # Default forward if no rule matches
       forward = {
-        target_group_key = "tg-1"
+        target_group_key = "tg-3"
       }
 
       rules = {
@@ -175,17 +175,3 @@ module "alb_ecs" {
   tags = local.common_tags
 }
 
-# # resource "aws_lb_target_group_attachment" "tg_1" {
-# #   target_group_arn = module.alb.target_groups["tg-1"].arn
-# #   for_each         = { for k, v in module.ec2-instance_private-app1 : k => v }
-# #   target_id        = each.value.id  # your EC2 instance ID
-# #   port             = 80             # must match target group port
-# # }
-
-
-# # resource "aws_lb_target_group_attachment" "tg_2" {
-# #   target_group_arn = module.alb.target_groups["tg-2"].arn
-# #   for_each         = { for k, v in module.ec2-instance_private-app2 : k => v }
-# #   target_id        = each.value.id  # your EC2 instance ID
-# #   port             = 80             # must match target group port
-# # }
