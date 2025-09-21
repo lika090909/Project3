@@ -1,45 +1,34 @@
-
 module "ecs_app3" {
   source  = "terraform-aws-modules/ecs/aws"
-  version = "6.3.0"
+  version = "6.4.0" # registry shows this as the newest available to you
 
   depends_on   = [module.alb_ecs]
   cluster_name = "app3"
 
-
   default_capacity_provider_strategy = { FARGATE = { weight = 100, base = 1 } }
-  
+
   services = {
     app3-service = {
       cpu           = 512
       memory        = 1024
       desired_count = 1
 
-     
-    # Let module create roles and attach your existing secret-read policy
-    create_task_iam_role       = true
-    create_task_exec_iam_role  = true
-    task_iam_role_policies = {
-      read_secret = aws_iam_policy.app3_secrets_read.arn
-    }
-    task_exec_iam_role_policies = {
-      exec = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
-    }
+      # ✅ Let the module CREATE the task role and ATTACH your managed policy (Terraform-only)
+      create_task_iam_role      = true
+      task_iam_role_policy_arns = [aws_iam_policy.app3_secrets_read.arn]
 
-    # IMPORTANT: delete these lines if present (module will set ARNs itself)
-    # task_role_arn      = aws_iam_role.app3_task_role.arn
-    # execution_role_arn = aws_iam_role.app3_exec_role.arn
+      # ✅ Execution role (logs/image pulls)
+      create_task_exec_iam_role = false
+      execution_role_arn        = aws_iam_role.app3_exec_role.arn
+      task_exec_iam_role_arn    = aws_iam_role.app3_exec_role.arn
 
-      # match app1 style
       deployment_minimum_healthy_percent = 100
       deployment_maximum_percent         = 200
       force_new_deployment               = true
-      
-      
-      
-      subnet_ids           = module.vpc.private_subnets
-      security_group_ids   = [aws_security_group.ecs_task_sg.id]
-      assign_public_ip     = false
+
+      subnet_ids            = module.vpc.private_subnets
+      security_group_ids    = [aws_security_group.ecs_task_sg.id]
+      assign_public_ip      = false
       create_security_group = false
 
       runtime_platform = {
@@ -63,10 +52,10 @@ module "ecs_app3" {
           }]
 
           environment = [
-          { name = "SECRET_ID",  value = data.aws_secretsmanager_secret.db.name },
-          { name = "AWS_REGION", value = "us-east-1" },
-          { name = "REV",        value = var.release }  # <-- forces new Task Definition revision
-        ]
+            { name = "SECRET_ID",  value = data.aws_secretsmanager_secret.db.name },
+            { name = "AWS_REGION", value = "us-east-1" },
+            { name = "REV",        value = var.release } # bump to force new TD revision
+          ]
 
           healthCheck = {
             command     = ["CMD-SHELL", "curl -sf http://localhost:8080/login || exit 1"]
@@ -80,7 +69,6 @@ module "ecs_app3" {
         }
       }
 
-      # 👇 singular map — key must match the container name above ("app3")
       load_balancer = {
         app3 = {
           target_group_arn = module.alb_ecs.target_groups["tg-3"].arn
@@ -89,13 +77,12 @@ module "ecs_app3" {
         }
       }
 
-      health_check_grace_period_seconds = 60
+      health_check_grace_period_seconds = 120
     }
   }
 }
 
-
 variable "release" {
   type    = string
-  default = "8"   # bump to "2","3"… to force a new TD revision
+  default = "13" # <- bump when you want a new task definition
 }
