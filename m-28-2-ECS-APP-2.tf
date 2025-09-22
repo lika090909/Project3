@@ -9,9 +9,9 @@ module "ecs_app2" {
 
   services = {
     app2-service = {
-      cpu           = 512
-      memory        = 1024
-      desired_count = 1
+      cpu    = 1024         # was 512
+      memory = 2048         # was 1024
+      desired_count = 2
       deployment_minimum_healthy_percent = 100
       deployment_maximum_percent         = 200
       force_new_deployment               = true

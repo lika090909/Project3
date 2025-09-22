@@ -9,9 +9,10 @@ module "ecs_app3" {
 
   services = {
     app3-service = {
-      cpu           = 512
-      memory        = 1024
-      desired_count = 1
+      
+      cpu    = 1024         # was 512
+      memory = 2048         # was 1024
+      desired_count = 2
 
       # use existing roles (module will NOT create new ones)
       create_tasks_iam_role      = false
