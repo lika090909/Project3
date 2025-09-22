@@ -2,10 +2,10 @@ module "alb_ecs" {
   source  = "terraform-aws-modules/alb/aws"
   version = "9.17.0"
 
-  name            = "${var.environment}-ALB-ECS"
-  vpc_id          = module.vpc.vpc_id
-  subnets         = module.vpc.public_subnets
-  security_groups = [module.alb_SG.security_group_id]
+  name                       = "${var.environment}-ALB-ECS"
+  vpc_id                     = module.vpc.vpc_id
+  subnets                    = module.vpc.public_subnets
+  security_groups            = [module.alb_SG.security_group_id]
   enable_deletion_protection = false
   create_security_group      = false
 
@@ -19,18 +19,18 @@ module "alb_ecs" {
         status_code = "HTTP_301"
       }
     }
-    
+
     # Here we are just opening the port 8080, if we want to connect like ALB_DNS:8080 
-    
-    java-https-redirect = {
-      port     = 8080
-     protocol = "HTTP"
-     redirect = {
-     port        = "443"
-     protocol    = "HTTPS"
-     status_code = "HTTP_301"
-  }
-}
+
+    # java-https-redirect = {
+    #   port     = 8080
+    #   protocol = "HTTP"
+    #   redirect = {
+    #     port        = "443"
+    #     protocol    = "HTTPS"
+    #     status_code = "HTTP_301"
+    #   }
+    # }
 
     listener-https = {
       port            = 443
@@ -104,8 +104,8 @@ module "alb_ecs" {
     }
   }
 
-   # Target group TYPE attachment and a Health check
-   
+  # Target group TYPE attachment and a Health check
+
   target_groups = {
     tg-1 = {
       protocol                          = "HTTP"
@@ -128,7 +128,7 @@ module "alb_ecs" {
       }
     }
 
-   # Target group TYPE attachment and a Health check
+    # Target group TYPE attachment and a Health check
     tg-2 = {
       protocol                          = "HTTP"
       port                              = 80
@@ -165,7 +165,7 @@ module "alb_ecs" {
         port                = 8080
         healthy_threshold   = 3
         unhealthy_threshold = 3
-        timeout             = 6
+        timeout             = 10
         protocol            = "HTTP"
         matcher             = "200-399"
       }

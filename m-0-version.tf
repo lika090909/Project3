@@ -1,7 +1,8 @@
 #Terraform Blockcheck 
 
 terraform {
-  required_version = "1.11.3"
+  # required_version = "1.11.3"
+  required_version = ">= 1.11.0, < 2.0.0"
   required_providers {
     aws = {
       source  = "hashicorp/aws"
