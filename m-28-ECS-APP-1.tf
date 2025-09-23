@@ -9,12 +9,19 @@ module "ecs_app1" {
 
   services = {
     app1-service = {
-      cpu    = 1024         # was 512
-      memory = 2048         # was 1024
+      cpu    = 1024         
+      memory = 2048        
       desired_count = 2
+      enable_autoscaling = false # Important! othervise will crash due to constant autoscaling
+      
+      # safer rolling deploys
       deployment_minimum_healthy_percent = 100
       deployment_maximum_percent         = 200
       force_new_deployment               = true
+      deployment_circuit_breaker = {
+        enable   = true
+        rollback = true
+      }
 
       subnet_ids           = module.vpc.private_subnets
       security_group_ids   = [aws_security_group.ecs_task_sg.id]
@@ -28,11 +35,12 @@ module "ecs_app1" {
 
       container_definitions = {
         app1 = {
-          cpu       = 512
-          memory    = 1024
+          cpu    = 512
+          memory = 1024
           essential = true
           image     = "lika090909/app1:v1.0.8"
           readonlyRootFilesystem = false
+
           portMappings = [{
             name          = "app1"
             containerPort = 80
@@ -44,7 +52,7 @@ module "ecs_app1" {
             interval    = 30
             timeout     = 5
             retries     = 3
-            startPeriod = 30
+            startPeriod = 60
           }
           cloudwatch_log_group_retention_in_days = 30
         }
@@ -58,8 +66,9 @@ module "ecs_app1" {
           container_port   = 80
         }
       }
-
-      health_check_grace_period_seconds = 60
+      
+      # allow time before ALB health checks count against new tasks
+      health_check_grace_period_seconds = 120
     }
   }
 }

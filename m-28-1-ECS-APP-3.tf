@@ -9,10 +9,10 @@ module "ecs_app3" {
 
   services = {
     app3-service = {
-      
-      cpu    = 1024         # was 512
-      memory = 2048         # was 1024
-      desired_count = 2
+      cpu                = 1024
+      memory             = 2048
+      enable_autoscaling = false
+      desired_count      = 2
 
       # use existing roles (module will NOT create new ones)
       create_tasks_iam_role      = false
@@ -46,21 +46,21 @@ module "ecs_app3" {
           }]
 
           environment = [
-        { name = "SECRET_ID", value = data.aws_secretsmanager_secret.db.name },
-        { name = "AWS_REGION", value = "us-east-1" },
-        { name = "REV", value = var.release },
+            { name = "SECRET_ID",  value = data.aws_secretsmanager_secret.db.arn },  # use ARN
+            { name = "AWS_REGION", value = "us-east-1" },
+            { name = "REV",        value = var.release },
 
-        # HTTPS behind ALB (you already added these):
-        { name = "SERVER_USE_FORWARD_HEADERS",     value = "true" },
-        { name = "SERVER_TOMCAT_PROTOCOL_HEADER",  value = "x-forwarded-proto" },
-        { name = "SERVER_TOMCAT_REMOTE_IP_HEADER", value = "x-forwarded-for" },
+            # HTTPS behind ALB
+            { name = "SERVER_USE_FORWARD_HEADERS",     value = "true" },
+            { name = "SERVER_TOMCAT_PROTOCOL_HEADER",  value = "x-forwarded-proto" },
+            { name = "SERVER_TOMCAT_REMOTE_IP_HEADER", value = "x-forwarded-for" },
 
-        # 👇 ensure it listens on the ALB-facing IP/port
-        { name = "SERVER_ADDRESS", value = "0.0.0.0" },
-        { name = "SERVER_PORT",    value = "8080" },
-      ]
+            # listen on ALB-facing IP/port
+            { name = "SERVER_ADDRESS", value = "0.0.0.0" },
+            { name = "SERVER_PORT",    value = "8080" }
+          ]
 
-
+          # ✅ Container health check (JSON-style map)
           healthCheck = {
             command     = ["CMD-SHELL", "curl -sf http://localhost:8080/login || exit 1"]
             interval    = 30
@@ -81,10 +81,17 @@ module "ecs_app3" {
         }
       }
 
+      # keep rollouts safe; tasks have time to warm up
       deployment_minimum_healthy_percent = 100
       deployment_maximum_percent         = 200
       force_new_deployment               = true
-      health_check_grace_period_seconds  = 120
+      health_check_grace_period_seconds  = 300
+
+      # (optional but recommended)
+      deployment_circuit_breaker = {
+        enable   = true
+        rollback = true
+      }
     }
   }
 }
