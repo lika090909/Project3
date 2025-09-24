@@ -3,6 +3,10 @@ resource "aws_cloudfront_distribution" "alb_origin" {
   is_ipv6_enabled = true
   aliases         = ["lalalalalalala7.com"]
 
+  web_acl_id = aws_wafv2_web_acl.cf_waf.arn  # <- attach WAF here
+
+  wait_for_deployment = true
+
   origin {
     domain_name = module.alb_ecs.dns_name
     origin_id   = "alb-origin"
@@ -46,4 +50,6 @@ resource "aws_cloudfront_distribution" "alb_origin" {
   }
 
   wait_for_deployment = true
+
+  
 }
