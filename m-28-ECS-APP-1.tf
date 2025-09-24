@@ -4,16 +4,41 @@ module "ecs_app1" {
   depends_on = [module.alb_ecs]
 
   cluster_name = "app1"
-
   default_capacity_provider_strategy = { FARGATE = { weight = 100, base = 1 } }
 
   services = {
     app1-service = {
-      cpu    = 1024         
-      memory = 2048        
+      cpu    = 1024
+      memory = 2048
       desired_count = 2
-      enable_autoscaling = false # Important! othervise will crash due to constant autoscaling
-      
+
+      # ✅ enable autoscaling
+      enable_autoscaling       = true
+      autoscaling_min_capacity = 2
+      autoscaling_max_capacity = 6
+
+      # Target tracking @ 50% CPU (optionally enable memory too)
+      autoscaling_policies = {
+        cpu = {
+          policy_type = "TargetTrackingScaling"
+          target_tracking_scaling_policy_configuration = {
+            target_value = 50
+            predefined_metric_specification = {
+              predefined_metric_type = "ECSServiceAverageCPUUtilization"
+            }
+            scale_in_cooldown  = 600
+            scale_out_cooldown = 60
+          }
+        }
+        # memory = {
+        #   policy_type            = "TargetTrackingScaling"
+        #   predefined_metric_type = "ECSServiceAverageMemoryUtilization"
+        #   target_value           = 60
+        #   scale_in_cooldown      = 600
+        #   scale_out_cooldown     = 60
+        # }
+      }  # <-- this closing brace was missing
+
       # safer rolling deploys
       deployment_minimum_healthy_percent = 100
       deployment_maximum_percent         = 200
@@ -23,10 +48,13 @@ module "ecs_app1" {
         rollback = true
       }
 
-      subnet_ids           = module.vpc.private_subnets
-      security_group_ids   = [aws_security_group.ecs_task_sg.id]
-      assign_public_ip     = false
-      create_security_group = false
+      # give tasks more time before ALB health checks count against them
+      health_check_grace_period_seconds = 180
+
+      subnet_ids             = module.vpc.private_subnets
+      security_group_ids     = [aws_security_group.ecs_task_sg.id]
+      assign_public_ip       = false
+      create_security_group  = false
 
       runtime_platform = {
         cpu_architecture        = "X86_64"
@@ -35,12 +63,11 @@ module "ecs_app1" {
 
       container_definitions = {
         app1 = {
-          cpu    = 512
-          memory = 1024
+          cpu       = 512
+          memory    = 1024
           essential = true
           image     = "lika090909/app1:v1.0.8"
           readonlyRootFilesystem = false
-
           portMappings = [{
             name          = "app1"
             containerPort = 80
@@ -58,17 +85,13 @@ module "ecs_app1" {
         }
       }
 
-      # 👇 NOTE: list of objects (square brackets)
-        load_balancer = {
+      load_balancer = {
         app1 = {
           target_group_arn = module.alb_ecs.target_groups["tg-1"].arn
-          container_name   = "app1"  # must match the container_definitions key
+          container_name   = "app1"
           container_port   = 80
         }
       }
-      
-      # allow time before ALB health checks count against new tasks
-      health_check_grace_period_seconds = 120
     }
   }
 }

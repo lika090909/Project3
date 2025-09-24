@@ -1,4 +1,4 @@
 variable "release" {
   type    = string
-  default = "1" # any string; bump it when you want a new task definition
+  default = "2" # any string; bump it when you want a new task definition
 }
