@@ -1,12 +1,12 @@
 # resource "aws_launch_template" "myec2_launch_template-app1" {
-  
+
 #   name = "${var.environment}-EC2-APP1"
 
 #   user_data           = filebase64("${path.module}/APP-1.sh")
 #   instance_type = var.instance_type
 #   key_name = var.private-ec2-keypair
 #   vpc_security_group_ids = [module.security-group_private.security_group_id]
-  
+
 #   update_default_version = true 
 
 #   block_device_mappings {
@@ -39,7 +39,7 @@
 
 #   instance_initiated_shutdown_behavior = "terminate"
 
-  
+
 
 #   metadata_options {
 #     http_endpoint               = "enabled"
@@ -52,6 +52,6 @@
 #     enabled = true
 #   }
 #   tags = local.common_tags
-  
+
 # }
 

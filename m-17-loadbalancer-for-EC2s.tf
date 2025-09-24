@@ -19,9 +19,9 @@
 #         status_code = "HTTP_301"
 #       }
 #     }
-    
+
 #     # Here we are just opening the port 8080, if we want to connect like ALB_DNS:8080 
-    
+
 #     java-https-redirect = {
 #       port     = 8080
 #      protocol = "HTTP"
@@ -105,7 +105,7 @@
 #   }
 
 #    # Target group TYPE attachment and a Health check
-   
+
 #   target_groups = {
 #     tg-1 = {
 #       protocol                          = "HTTP"

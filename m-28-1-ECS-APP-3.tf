@@ -1,10 +1,10 @@
 
 module "ecs_app3" {
-  source  = "terraform-aws-modules/ecs/aws"
-  version = "6.3.0"
+  source     = "terraform-aws-modules/ecs/aws"
+  version    = "6.3.0"
   depends_on = [module.alb_ecs]
 
-  cluster_name = "app3"
+  cluster_name                       = "app3"
   default_capacity_provider_strategy = { FARGATE = { weight = 100, base = 1 } }
 
   services = {
@@ -38,7 +38,7 @@ module "ecs_app3" {
       deployment_minimum_healthy_percent = 100
       deployment_maximum_percent         = 200
       force_new_deployment               = true
-      deployment_circuit_breaker = { enable = true, rollback = true }
+      deployment_circuit_breaker         = { enable = true, rollback = true }
       health_check_grace_period_seconds  = 180
 
       subnet_ids            = module.vpc.private_subnets
@@ -53,32 +53,36 @@ module "ecs_app3" {
 
       container_definitions = {
         app3 = {
-          cpu       = 512
-          memory    = 1024
-          essential = true
-          image     = "lika090909/app3:v1.0.1"
+          cpu                    = 512
+          memory                 = 1024
+          essential              = true
+          image                  = "lika090909/app3:v1.0.1"
           readonlyRootFilesystem = false
 
           portMappings = [{
-            name          = "app3"      # <-- fix: match container name
-            containerPort = 8080        # <-- 8080 everywhere
+            name          = "app3" # <-- fix: match container name
+            containerPort = 8080   # <-- 8080 everywhere
             hostPort      = 8080
             protocol      = "tcp"
           }]
 
           environment = [
-            { name = "SECRET_ID",  value = data.aws_secretsmanager_secret.db.arn },
+            { name = "SECRET_ID", value = data.aws_secretsmanager_secret.db.arn },
             { name = "AWS_REGION", value = "us-east-1" },
-            { name = "REV",        value = var.release },
+            { name = "REV", value = var.release },
 
             # HTTPS behind ALB
-            { name = "SERVER_USE_FORWARD_HEADERS",     value = "true" },
-            { name = "SERVER_TOMCAT_PROTOCOL_HEADER",  value = "x-forwarded-proto" },
+            { name = "SERVER_USE_FORWARD_HEADERS", value = "true" },
+            { name = "SERVER_TOMCAT_PROTOCOL_HEADER", value = "x-forwarded-proto" },
             { name = "SERVER_TOMCAT_REMOTE_IP_HEADER", value = "x-forwarded-for" },
 
-            # listen on 8080
-            { name = "SERVER_ADDRESS", value = "0.0.0.0" },
-            { name = "SERVER_PORT",    value = "8080" }
+            # # listen on 8080
+            # { name = "SERVER_ADDRESS", value = "0.0.0.0" },
+            # { name = "SERVER_PORT",    value = "8080" }
+
+            # add these two:
+            { name = "SERVER_TOMCAT_PORT_HEADER", value = "x-forwarded-port" },
+            { name = "SERVER_TOMCAT_INTERNAL_PROXIES", value = ".*" }
           ]
 
           # app responds on /login on 8080
@@ -98,7 +102,7 @@ module "ecs_app3" {
         app3 = {
           target_group_arn = module.alb_ecs.target_groups["tg-3"].arn
           container_name   = "app3"
-          container_port   = 8080       # <-- 8080 here too
+          container_port   = 8080 # <-- 8080 here too
         }
       }
     }

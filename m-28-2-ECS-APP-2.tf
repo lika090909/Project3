@@ -1,16 +1,16 @@
 
 module "ecs_app2" {
-  source  = "terraform-aws-modules/ecs/aws"
-  version = "6.3.0"
+  source     = "terraform-aws-modules/ecs/aws"
+  version    = "6.3.0"
   depends_on = [module.alb_ecs]
 
-  cluster_name = "app2"
+  cluster_name                       = "app2"
   default_capacity_provider_strategy = { FARGATE = { weight = 100, base = 1 } }
 
   services = {
     app2-service = {
-      cpu    = 1024
-      memory = 2048
+      cpu           = 1024
+      memory        = 2048
       desired_count = 2
 
       # ✅ enable autoscaling
@@ -38,7 +38,7 @@ module "ecs_app2" {
         #   scale_in_cooldown      = 600
         #   scale_out_cooldown     = 60
         # }
-      }  # <-- this closing brace was missing
+      } # <-- this closing brace was missing
 
       # safer rolling deploys
       deployment_minimum_healthy_percent = 100
@@ -52,10 +52,10 @@ module "ecs_app2" {
       # give tasks more time before ALB health checks count against them
       health_check_grace_period_seconds = 180
 
-      subnet_ids             = module.vpc.private_subnets
-      security_group_ids     = [aws_security_group.ecs_task_sg.id]
-      assign_public_ip       = false
-      create_security_group  = false
+      subnet_ids            = module.vpc.private_subnets
+      security_group_ids    = [aws_security_group.ecs_task_sg.id]
+      assign_public_ip      = false
+      create_security_group = false
 
       runtime_platform = {
         cpu_architecture        = "X86_64"
@@ -64,10 +64,10 @@ module "ecs_app2" {
 
       container_definitions = {
         app2 = {
-          cpu       = 512
-          memory    = 1024
-          essential = true
-          image     = "lika090909/app2:v1.0.1"
+          cpu                    = 512
+          memory                 = 1024
+          essential              = true
+          image                  = "lika090909/app2:v1.0.1"
           readonlyRootFilesystem = false
 
           portMappings = [{
@@ -76,6 +76,15 @@ module "ecs_app2" {
             hostPort      = 80
             protocol      = "tcp"
           }]
+
+          environment = [
+            { name = "SERVER_USE_FORWARD_HEADERS", value = "true" },
+            { name = "SERVER_TOMCAT_PROTOCOL_HEADER", value = "x-forwarded-proto" },
+            { name = "SERVER_TOMCAT_REMOTE_IP_HEADER", value = "x-forwarded-for" },
+            { name = "SERVER_TOMCAT_PORT_HEADER", value = "x-forwarded-port" },
+            { name = "SERVER_TOMCAT_INTERNAL_PROXIES", value = ".*" }
+          ]
+
           healthCheck = {
             command     = ["CMD-SHELL", "curl -sf http://localhost:80/app1/ || exit 1"]
             interval    = 30

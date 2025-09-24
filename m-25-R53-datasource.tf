@@ -8,7 +8,7 @@ data "aws_route53_zone" "mydomain" {
 
 output "zone_id" {
   description = "zone id"
-  value = data.aws_route53_zone.mydomain.zone_id
-  
+  value       = data.aws_route53_zone.mydomain.zone_id
+
 }
 

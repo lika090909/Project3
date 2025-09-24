@@ -21,7 +21,7 @@
 #   default_instance_warmup   = 300
 #   health_check_type         = "EC2"
 #  #   vpc_zone_identifier       = module.vpc.private_subnets
-  
+
 #    traffic_source_attachments = {
 #     alb = {
 #       traffic_source_identifier = module.alb.target_groups["tg-2"].arn
@@ -35,14 +35,14 @@
 #       default_result       = "CONTINUE"
 #       heartbeat_timeout    = 60
 #       lifecycle_transition = "autoscaling:EC2_INSTANCE_LAUNCHING"
-      
+
 #     },
 #     {
 #       name                 = "ExampleTerminationLifeCycleHook"
 #       default_result       = "CONTINUE"
 #       heartbeat_timeout    = 60
 #       lifecycle_transition = "autoscaling:EC2_INSTANCE_TERMINATING"
-      
+
 #     }
 #   ]
 
@@ -69,7 +69,7 @@
 #     #     alarms = [module.auto_rollback.cloudwatch_metric_alarm_id]
 #     #   }
 #     }
-    
+
 #     triggers = ["launch_template"] 
 #   }
 

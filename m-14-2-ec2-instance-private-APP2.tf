@@ -11,15 +11,15 @@
 #   instance_type          = var.instance_type
 #   key_name               = var.private-ec2-keypair
 
-  
+
 #   for_each = toset(["0", "1"])
 #   subnet_id =  element(module.vpc.private_subnets, tonumber(each.key))
 #   vpc_security_group_ids = [module.security-group_private.security_group_id]  
-  
-  
+
+
 #   create_security_group = false
 
-  
+
 
 #   user_data           = file("${path.module}/APP-2.sh")
 #   user_data_replace_on_change = true
@@ -50,8 +50,8 @@
 #       }
 #     }
 #   }
-  
-  
+
+
 
 #   tags = local.common_tags
 # }

@@ -1,5 +1,5 @@
 data "aws_secretsmanager_secret" "db" {
-  name = "dev/database_creds"  
+  name = "dev/database_creds"
 }
 
 locals {

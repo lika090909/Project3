@@ -9,34 +9,43 @@ module "alb_ecs" {
   enable_deletion_protection = false
   create_security_group      = false
 
+  # THIS IS IF ALB IS GETTING THE REQUEST AND NOT THE CLOUDFRONT
+
+  # listeners = {
+  #   http = {
+  #     port     = 80
+  #     protocol = "HTTP"
+  #     redirect = {
+  #       port        = "443"
+  #       protocol    = "HTTPS"
+  #       status_code = "HTTP_301"
+  #     }
+  #   }
+
+  # Here we are just opening the port 8080, if we want to connect like ALB_DNS:8080 
+
+  # java-https-redirect = {
+  #   port     = 8080
+  #   protocol = "HTTP"
+  #   redirect = {
+  #     port        = "443"
+  #     protocol    = "HTTPS"
+  #     status_code = "HTTP_301"
+  #   }
+  # }
+
+  # THIS IS IF ALB IS GETTING THE REQUEST AND NOT THE CLOUDFRONT
+
+  # listener-https = {
+  #   port            = 443
+  #   protocol        = "HTTPS"
+  #   ssl_policy      = "ELBSecurityPolicy-TLS13-1-2-Res-2021-06"
+  #   certificate_arn = data.aws_acm_certificate.issued.arn
+
   listeners = {
     http = {
       port     = 80
       protocol = "HTTP"
-      redirect = {
-        port        = "443"
-        protocol    = "HTTPS"
-        status_code = "HTTP_301"
-      }
-    }
-
-    # Here we are just opening the port 8080, if we want to connect like ALB_DNS:8080 
-
-    # java-https-redirect = {
-    #   port     = 8080
-    #   protocol = "HTTP"
-    #   redirect = {
-    #     port        = "443"
-    #     protocol    = "HTTPS"
-    #     status_code = "HTTP_301"
-    #   }
-    # }
-
-    listener-https = {
-      port            = 443
-      protocol        = "HTTPS"
-      ssl_policy      = "ELBSecurityPolicy-TLS13-1-2-Res-2021-06"
-      certificate_arn = data.aws_acm_certificate.issued.arn
 
       # Default forward if no rule matches
       forward = {

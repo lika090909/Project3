@@ -1,8 +1,8 @@
 data "aws_ami" "amz-2023" {
 
-  most_recent      = true
- # name_regex       = "^myami-[0-9]{3}"
-  owners           = ["amazon"]
+  most_recent = true
+  # name_regex       = "^myami-[0-9]{3}"
+  owners = ["amazon"]
 
   filter {
     name   = "name"
@@ -19,9 +19,9 @@ data "aws_ami" "amz-2023" {
     values = ["hvm"]
   }
 
-    filter {
-    name = "architecture"
-    values = [ "x86_64" ]
+  filter {
+    name   = "architecture"
+    values = ["x86_64"]
   }
 }
 

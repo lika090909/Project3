@@ -1,8 +1,8 @@
 
 # resource "aws_launch_template" "myec2_launch_template-app3" {
-  
+
 #   name = "${var.environment}-EC2-APP3"
-  
+
 #     iam_instance_profile {
 #     name = aws_iam_instance_profile.ec2_profile.name
 #   }
@@ -13,7 +13,7 @@
 #   #   db_password            = var.db_password
 #   #   }), "\r\n", "\n"))
 
-  
+
 #   user_data = base64encode(
 #   replace(
 #     templatefile("${path.module}/APP-3_WSM.sh", {
@@ -23,7 +23,7 @@
 #   )
 # )
 
-  
+
 
 #   instance_type = var.instance_type
 #   key_name = var.private-ec2-keypair
@@ -61,7 +61,7 @@
 
 #   instance_initiated_shutdown_behavior = "terminate"
 
-  
+
 
 #   metadata_options {
 #     http_endpoint               = "enabled"
@@ -75,5 +75,5 @@
 #   }
 #   tags = local.common_tags
 
-  
+
 # }

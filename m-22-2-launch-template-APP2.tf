@@ -1,5 +1,5 @@
 # resource "aws_launch_template" "myec2_launch_template-app2" {
-  
+
 #   name = "${var.environment}-EC2-APP2"
 
 #   user_data           = filebase64("${path.module}/APP-2.sh")
@@ -39,7 +39,7 @@
 
 #   instance_initiated_shutdown_behavior = "terminate"
 
-  
+
 
 #   metadata_options {
 #     http_endpoint               = "enabled"
@@ -53,5 +53,5 @@
 #   }
 #   tags = local.common_tags
 
-  
+
 # }

@@ -16,7 +16,7 @@
 #   create_eip             = true
 #   #associate_public_ip_address = true
 #   create_security_group = false
-  
+
 #   tags = local.common_tags
 # }
 
