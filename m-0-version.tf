@@ -18,4 +18,11 @@ provider "aws" {
   region  = var.aws_region
 }
 
+provider "aws" {
+  alias   = "us_east_1"
+  profile = var.aws_credential_profile
+  region  = "us-east-1"
+}
+
+
 

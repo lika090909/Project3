@@ -14,16 +14,17 @@
 # }
 
 
-data "aws_acm_certificate" "issued" {
-  domain   = "lalalalalalala7.com"
-  statuses = ["ISSUED"]
+data "aws_acm_certificate" "cf_cert" {
+  domain       = "lalalalalalala7.com"
+  statuses     = ["ISSUED"]
+  most_recent  = true
 }
 
 output "aws_acm_certificate_arn" {
-  description = "zone id"
-  value       = data.aws_acm_certificate.issued.arn
-
+  description = "CloudFront cert ARN"
+  value       = data.aws_acm_certificate.cf_cert.arn
 }
+
 
 
 

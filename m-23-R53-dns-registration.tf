@@ -1,3 +1,4 @@
+
 # Apex: lalalalalalala7.com -> CloudFront
 resource "aws_route53_record" "apex_to_cf" {
   zone_id = data.aws_route53_zone.mydomain.zone_id
@@ -10,6 +11,28 @@ resource "aws_route53_record" "apex_to_cf" {
     evaluate_target_health = false
   }
 }
+
+data "aws_lb" "alb" {
+  name = "${var.environment}-ALB-ECS"
+}
+
+resource "aws_route53_record" "alb_origin" {
+  zone_id = data.aws_route53_zone.mydomain.zone_id
+  name    = "origin.${var.domain_name}"
+  type    = "A"
+
+  alias {
+    name                   = data.aws_lb.alb.dns_name
+    zone_id                = data.aws_lb.alb.zone_id
+    evaluate_target_health = true
+  }
+}
+
+
+
+
+
+
 
 # # WWW: www.lalalalalalala7.com -> CloudFront (or CNAME to apex)
 # resource "aws_route53_record" "www_to_cf" {

@@ -8,7 +8,7 @@ resource "aws_security_group" "ecs_task_sg" {
     from_port       = 80
     to_port         = 80
     protocol        = "tcp"
-    security_groups = [module.alb_SG.security_group_id]
+    security_groups = [aws_security_group.alb_private_sg.id]
   }
 
   egress {
@@ -28,6 +28,6 @@ resource "aws_security_group_rule" "alb_to_task_8080" {
   to_port                  = 8080
   protocol                 = "tcp"
   security_group_id        = aws_security_group.ecs_task_sg.id
-  source_security_group_id = module.alb_SG.security_group_id
+  source_security_group_id = aws_security_group.alb_private_sg.id
   description              = "ALB to ECS tasks on 8080"
 }

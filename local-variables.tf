@@ -19,7 +19,7 @@ locals {
 
 variable "domain_name" {
   description = "domain name"
-  default     = "www.lalalalalalala7.com"
+  default     = "lalalalalalala7.com"
   type        = string
 }
 
