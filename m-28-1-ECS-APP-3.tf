@@ -1,4 +1,3 @@
-
 module "ecs_app3" {
   source     = "terraform-aws-modules/ecs/aws"
   version    = "6.3.0"
@@ -51,17 +50,17 @@ module "ecs_app3" {
         operating_system_family = "LINUX"
       }
 
+      # ✅ map(object), без jsonencode
       container_definitions = {
         app3 = {
-          cpu                    = 512
-          memory                 = 1024
-          essential              = true
-          image                  = "lika090909/app3:v1.0.1"
-          readonlyRootFilesystem = false
+          cpu       = 512
+          memory    = 1024
+          essential = true
+          image     = "lika090909/app3:v1.0.1"
 
-          portMappings = [{
-            name          = "app3" # <-- fix: match container name
-            containerPort = 8080   # <-- 8080 everywhere
+          port_mappings = [{
+            name          = "app3"
+            containerPort = 8080
             hostPort      = 8080
             protocol      = "tcp"
           }]
@@ -70,23 +69,14 @@ module "ecs_app3" {
             { name = "SECRET_ID", value = data.aws_secretsmanager_secret.db.arn },
             { name = "AWS_REGION", value = "us-east-1" },
             { name = "REV", value = var.release },
-
-            # HTTPS behind ALB
             { name = "SERVER_USE_FORWARD_HEADERS", value = "true" },
             { name = "SERVER_TOMCAT_PROTOCOL_HEADER", value = "x-forwarded-proto" },
             { name = "SERVER_TOMCAT_REMOTE_IP_HEADER", value = "x-forwarded-for" },
-
-            # # listen on 8080
-            # { name = "SERVER_ADDRESS", value = "0.0.0.0" },
-            # { name = "SERVER_PORT",    value = "8080" }
-
-            # add these two:
             { name = "SERVER_TOMCAT_PORT_HEADER", value = "x-forwarded-port" },
             { name = "SERVER_TOMCAT_INTERNAL_PROXIES", value = ".*" }
           ]
 
-          # app responds on /login on 8080
-          healthCheck = {
+          healthcheck = {
             command     = ["CMD-SHELL", "curl -sf http://localhost:8080/login || exit 1"]
             interval    = 30
             timeout     = 5
@@ -94,7 +84,14 @@ module "ecs_app3" {
             startPeriod = 60
           }
 
-          cloudwatch_log_group_retention_in_days = 30
+          log_configuration = {
+            log_driver = "awslogs"
+            options = {
+              awslogs-group         = "/aws/ecs/app3-service/app3"
+              awslogs-region        = "us-east-1"
+              awslogs-stream-prefix = "ecs"
+            }
+          }
         }
       }
 
@@ -102,11 +99,9 @@ module "ecs_app3" {
         app3 = {
           target_group_arn = module.alb_ecs.target_groups["tg-3"].arn
           container_name   = "app3"
-          container_port   = 8080 # <-- 8080 here too
+          container_port   = 8080
         }
       }
     }
   }
 }
-
-

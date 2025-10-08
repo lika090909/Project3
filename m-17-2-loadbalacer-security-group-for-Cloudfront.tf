@@ -1,22 +1,22 @@
-resource "aws_security_group" "alb_private_sg" {
-  name        = "${var.environment}-alb-private-sg"
-  description = "ALB only accessible from CloudFront"
+resource "aws_security_group" "alb_cf_sg" {
+  name        = "${var.environment}-alb-cf-sg"   # ✅ fixed name
+  description = "ALB accessible only from CloudFront"
   vpc_id      = module.vpc.vpc_id
 
   ingress {
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"] # you could tighten this to CF IP ranges
-    description = "HTTPS from CloudFront"
+    from_port       = 80
+    to_port         = 80
+    protocol        = "tcp"
+    prefix_list_ids = ["pl-3b927c52"]
+    description     = "HTTP from CloudFront"
   }
 
   ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-    description = "HTTP from CloudFront (redirect to HTTPS)"
+    from_port       = 443
+    to_port         = 443
+    protocol        = "tcp"
+    prefix_list_ids = ["pl-3b927c52"]
+    description     = "HTTPS from CloudFront"
   }
 
   egress {

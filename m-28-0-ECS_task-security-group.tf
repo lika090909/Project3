@@ -1,5 +1,3 @@
-# ECS Task SG for APP1 and APP2 (on port 80)
-
 resource "aws_security_group" "ecs_task_sg" {
   name   = "${var.environment}-ecs-task-sg"
   vpc_id = module.vpc.vpc_id
@@ -8,7 +6,7 @@ resource "aws_security_group" "ecs_task_sg" {
     from_port       = 80
     to_port         = 80
     protocol        = "tcp"
-    security_groups = [aws_security_group.alb_private_sg.id]
+    security_groups = [aws_security_group.alb_cf_sg.id]   # 👈 fix here
   }
 
   egress {
@@ -19,15 +17,12 @@ resource "aws_security_group" "ecs_task_sg" {
   }
 }
 
-
-# ECS Task SG for APP3 (on port 8080)
-
 resource "aws_security_group_rule" "alb_to_task_8080" {
   type                     = "ingress"
   from_port                = 8080
   to_port                  = 8080
   protocol                 = "tcp"
   security_group_id        = aws_security_group.ecs_task_sg.id
-  source_security_group_id = aws_security_group.alb_private_sg.id
+  source_security_group_id = aws_security_group.alb_cf_sg.id   # 👈 fix here
   description              = "ALB to ECS tasks on 8080"
 }

@@ -1,28 +1,28 @@
-#Terraform Blockcheck 
+# #Terraform Blockcheck 
 
-terraform {
-  # required_version = "1.11.3"
-  required_version = ">= 1.11.0, < 2.0.0"
-  required_providers {
-    aws = {
-      source = "hashicorp/aws"
-      # version = ">=6.6.0"
-      version = ">= 6.12, < 7.0"
-    }
-  }
-}
+# terraform {
+#   # required_version = "1.11.3"
+#   required_version = ">= 1.11.0, < 2.0.0"
+#   required_providers {
+#     aws = {
+#       source = "hashicorp/aws"
+#       # version = ">=6.6.0"
+#       version = ">= 6.12, < 7.0"
+#     }
+#   }
+# }
 
-# Configure the AWS Provider
-provider "aws" {
-  profile = var.aws_credential_profile
-  region  = var.aws_region
-}
+# # Configure the AWS Provider
+# provider "aws" {
+#   profile = var.aws_credential_profile
+#   region  = var.aws_region
+# }
 
-provider "aws" {
-  alias   = "us_east_1"
-  profile = var.aws_credential_profile
-  region  = "us-east-1"
-}
+# provider "aws" {
+#   alias   = "us_east_1"
+#   profile = var.aws_credential_profile
+#   region  = "us-east-1"
+# }
 
 
 
