@@ -1,0 +1,13 @@
+[
+  {
+    "IpProtocol": "tcp",
+    "FromPort": 443,
+    "ToPort": 443,
+    "PrefixListIds": [
+      {
+        "PrefixListId": "pl-3b927c52"
+      }
+    ]
+  }
+]
+

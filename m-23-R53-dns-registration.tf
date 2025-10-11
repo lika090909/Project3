@@ -11,23 +11,6 @@ resource "aws_route53_record" "apex_to_cf" {
   }
 }
 
-# # WWW: www.lalalalalalala7.com -> CloudFront (or CNAME to apex)
-# resource "aws_route53_record" "www_to_cf" {
-#   zone_id = data.aws_route53_zone.mydomain.zone_id
-#   name    = "www"
-#   type    = "A"
-
-#   alias {
-#     name                   = aws_cloudfront_distribution.alb_origin.domain_name
-#     zone_id                = aws_cloudfront_distribution.alb_origin.hosted_zone_id
-#     evaluate_target_health = false
-#   }
-# }
-
-
-
-
-
 
 # resource "aws_route53_record" "R53_registration_with_www" {
 #   zone_id = data.aws_route53_zone.mydomain.zone_id

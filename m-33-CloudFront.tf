@@ -3,16 +3,16 @@ resource "aws_cloudfront_distribution" "alb_origin" {
   is_ipv6_enabled = true
   aliases         = ["lalalalalalala7.com"]
 
-  web_acl_id = aws_wafv2_web_acl.cf_waf.arn  # <- attach WAF here
+  # web_acl_id = aws_wafv2_web_acl.cf_waf.arn  # <- attach WAF here
 
-  wait_for_deployment = true
+  # wait_for_deployment = true
 
   origin {
     domain_name = module.alb_ecs.dns_name
     origin_id   = "alb-origin"
 
     custom_origin_config {
-      origin_protocol_policy = "http-only"
+      origin_protocol_policy = "https-only"
       http_port              = 80
       https_port             = 443
       origin_ssl_protocols   = ["TLSv1.2"]
@@ -25,8 +25,8 @@ resource "aws_cloudfront_distribution" "alb_origin" {
     allowed_methods        = ["GET", "HEAD", "OPTIONS", "PUT", "POST", "PATCH", "DELETE"]
     cached_methods         = ["GET", "HEAD"]
 
-    cache_policy_id          = "658327ea-f89d-4fab-a63d-7e88639e58f6" # CachingOptimized
-    origin_request_policy_id = "216adef6-5c7f-47e4-b989-5492eafa07d3" # AllViewer
+    cache_policy_id          = aws_cloudfront_cache_policy.no_cache.id # CachingOptimized
+    origin_request_policy_id = aws_cloudfront_origin_request_policy.all_viewer_with_auth.id # AllViewer
 
     # CloudFront Function attach (singular block)
     function_association {
