@@ -1,186 +1,186 @@
-module "alb_ecs" {
-  source  = "terraform-aws-modules/alb/aws"
-  version = "9.17.0"
+# module "alb_ecs" {
+#   source  = "terraform-aws-modules/alb/aws"
+#   version = "9.17.0"
 
-  name                       = "${var.environment}-ALB-ECS"
-  vpc_id                     = module.vpc.vpc_id
-  subnets                    = module.vpc.public_subnets
-  security_groups            = [module.alb_SG.security_group_id]
-  enable_deletion_protection = false
-  create_security_group      = false
+#   name                       = "${var.environment}-ALB-ECS"
+#   vpc_id                     = module.vpc.vpc_id
+#   subnets                    = module.vpc.public_subnets
+#   security_groups            = [module.alb_SG.security_group_id]
+#   enable_deletion_protection = false
+#   create_security_group      = false
 
-  # THIS IS IF ALB IS GETTING THE REQUEST AND NOT THE CLOUDFRONT
+#   # THIS IS IF ALB IS GETTING THE REQUEST AND NOT THE CLOUDFRONT
 
-  # listeners = {
-  #   http = {
-  #     port     = 80
-  #     protocol = "HTTP"
-  #     redirect = {
-  #       port        = "443"
-  #       protocol    = "HTTPS"
-  #       status_code = "HTTP_301"
-  #     }
-  #   }
+#   # listeners = {
+#   #   http = {
+#   #     port     = 80
+#   #     protocol = "HTTP"
+#   #     redirect = {
+#   #       port        = "443"
+#   #       protocol    = "HTTPS"
+#   #       status_code = "HTTP_301"
+#   #     }
+#   #   }
 
-  # Here we are just opening the port 8080, if we want to connect like ALB_DNS:8080 
+#   # Here we are just opening the port 8080, if we want to connect like ALB_DNS:8080 
 
-  # java-https-redirect = {
-  #   port     = 8080
-  #   protocol = "HTTP"
-  #   redirect = {
-  #     port        = "443"
-  #     protocol    = "HTTPS"
-  #     status_code = "HTTP_301"
-  #   }
-  # }
+#   # java-https-redirect = {
+#   #   port     = 8080
+#   #   protocol = "HTTP"
+#   #   redirect = {
+#   #     port        = "443"
+#   #     protocol    = "HTTPS"
+#   #     status_code = "HTTP_301"
+#   #   }
+#   # }
 
-  # THIS IS IF ALB IS GETTING THE REQUEST AND NOT THE CLOUDFRONT
+#   # THIS IS IF ALB IS GETTING THE REQUEST AND NOT THE CLOUDFRONT
 
-  # listener-https = {
-  #   port            = 443
-  #   protocol        = "HTTPS"
-  #   ssl_policy      = "ELBSecurityPolicy-TLS13-1-2-Res-2021-06"
-  #   certificate_arn = data.aws_acm_certificate.issued.arn
+#   # listener-https = {
+#   #   port            = 443
+#   #   protocol        = "HTTPS"
+#   #   ssl_policy      = "ELBSecurityPolicy-TLS13-1-2-Res-2021-06"
+#   #   certificate_arn = data.aws_acm_certificate.issued.arn
 
-  listeners = {
-    http = {
-      port     = 80
-      protocol = "HTTP"
+#   listeners = {
+#     http = {
+#       port     = 80
+#       protocol = "HTTP"
 
-      # Default forward if no rule matches
-      forward = {
-        target_group_key = "tg-3"
-      }
+#       # Default forward if no rule matches
+#       forward = {
+#         target_group_key = "tg-3"
+#       }
 
-      rules = {
-        app1-path-rule = {
-          priority = 10
-          actions = [{
-            type             = "forward"
-            target_group_key = "tg-1"
-          }]
-          conditions = [{
-            path_pattern = {
-              values = ["/app1*"]
-            }
-          }]
-        }
-
-
-        app2-path-rule = {
-          priority = 25
-          actions = [{
-            type             = "forward"
-            target_group_key = "tg-2"
-          }]
-          conditions = [{
-            path_pattern = {
-              values = ["/app2*"]
-            }
-          }]
-        }
-
-        app3-path-rule = {
-          priority = 27
-          actions = [{
-            type             = "forward"
-            target_group_key = "tg-3"
-          }]
-          conditions = [{
-            path_pattern = {
-              values = ["/app3/*"]
-            }
-          }]
-        }
-
-        # ex-fixed-response = {
-        #   priority = 30
-        #   actions = [{
-        #     type         = "fixed-response"
-        #     content_type = "text/plain"
-        #     status_code  = 200
-        #     message_body = "This is a fixed response"
-        #   }]
-        #   conditions = [{
-        #     path_pattern = {
-        #       values = ["/"]
-        #     }
-        #   }]
-        # }
+#       rules = {
+#         app1-path-rule = {
+#           priority = 10
+#           actions = [{
+#             type             = "forward"
+#             target_group_key = "tg-1"
+#           }]
+#           conditions = [{
+#             path_pattern = {
+#               values = ["/app1*"]
+#             }
+#           }]
+#         }
 
 
-      }
-    }
-  }
+#         app2-path-rule = {
+#           priority = 25
+#           actions = [{
+#             type             = "forward"
+#             target_group_key = "tg-2"
+#           }]
+#           conditions = [{
+#             path_pattern = {
+#               values = ["/app2*"]
+#             }
+#           }]
+#         }
 
-  # Target group TYPE attachment and a Health check
+#         app3-path-rule = {
+#           priority = 27
+#           actions = [{
+#             type             = "forward"
+#             target_group_key = "tg-3"
+#           }]
+#           conditions = [{
+#             path_pattern = {
+#               values = ["/app3/*"]
+#             }
+#           }]
+#         }
 
-  target_groups = {
-    tg-1 = {
-      protocol                          = "HTTP"
-      port                              = 80
-      target_type                       = "ip"
-      deregistration_delay              = 10
-      load_balancing_cross_zone_enabled = false
-      create_attachment                 = false
+#         # ex-fixed-response = {
+#         #   priority = 30
+#         #   actions = [{
+#         #     type         = "fixed-response"
+#         #     content_type = "text/plain"
+#         #     status_code  = 200
+#         #     message_body = "This is a fixed response"
+#         #   }]
+#         #   conditions = [{
+#         #     path_pattern = {
+#         #       values = ["/"]
+#         #     }
+#         #   }]
+#         # }
 
-      health_check = {
-        enabled             = true
-        interval            = 30
-        path                = "/app1/"
-        port                = 80
-        healthy_threshold   = 3
-        unhealthy_threshold = 3
-        timeout             = 6
-        protocol            = "HTTP"
-        matcher             = "200-399"
-      }
-    }
 
-    # Target group TYPE attachment and a Health check
-    tg-2 = {
-      protocol                          = "HTTP"
-      port                              = 80
-      target_type                       = "ip"
-      deregistration_delay              = 10
-      load_balancing_cross_zone_enabled = false
-      create_attachment                 = false
+#       }
+#     }
+#   }
 
-      health_check = {
-        enabled             = true
-        interval            = 30
-        path                = "/app2/"
-        port                = 80
-        healthy_threshold   = 3
-        unhealthy_threshold = 3
-        timeout             = 6
-        protocol            = "HTTP"
-        matcher             = "200-399"
-      }
-    }
+#   # Target group TYPE attachment and a Health check
 
-    tg-3 = {
-      protocol                          = "HTTP"
-      port                              = 8080
-      target_type                       = "ip"
-      deregistration_delay              = 10
-      load_balancing_cross_zone_enabled = false
-      create_attachment                 = false
+#   target_groups = {
+#     tg-1 = {
+#       protocol                          = "HTTP"
+#       port                              = 80
+#       target_type                       = "ip"
+#       deregistration_delay              = 10
+#       load_balancing_cross_zone_enabled = false
+#       create_attachment                 = false
 
-      health_check = {
-        enabled             = true
-        interval            = 30
-        path                = "/login"
-        port                = 8080
-        healthy_threshold   = 3
-        unhealthy_threshold = 3
-        timeout             = 10
-        protocol            = "HTTP"
-        matcher             = "200-399"
-      }
-    }
-  }
+#       health_check = {
+#         enabled             = true
+#         interval            = 30
+#         path                = "/app1/"
+#         port                = 80
+#         healthy_threshold   = 3
+#         unhealthy_threshold = 3
+#         timeout             = 6
+#         protocol            = "HTTP"
+#         matcher             = "200-399"
+#       }
+#     }
 
-  tags = local.common_tags
-}
+#     # Target group TYPE attachment and a Health check
+#     tg-2 = {
+#       protocol                          = "HTTP"
+#       port                              = 80
+#       target_type                       = "ip"
+#       deregistration_delay              = 10
+#       load_balancing_cross_zone_enabled = false
+#       create_attachment                 = false
+
+#       health_check = {
+#         enabled             = true
+#         interval            = 30
+#         path                = "/app2/"
+#         port                = 80
+#         healthy_threshold   = 3
+#         unhealthy_threshold = 3
+#         timeout             = 6
+#         protocol            = "HTTP"
+#         matcher             = "200-399"
+#       }
+#     }
+
+#     tg-3 = {
+#       protocol                          = "HTTP"
+#       port                              = 8080
+#       target_type                       = "ip"
+#       deregistration_delay              = 10
+#       load_balancing_cross_zone_enabled = false
+#       create_attachment                 = false
+
+#       health_check = {
+#         enabled             = true
+#         interval            = 30
+#         path                = "/login"
+#         port                = 8080
+#         healthy_threshold   = 3
+#         unhealthy_threshold = 3
+#         timeout             = 10
+#         protocol            = "HTTP"
+#         matcher             = "200-399"
+#       }
+#     }
+#   }
+
+#   tags = local.common_tags
+# }
 
