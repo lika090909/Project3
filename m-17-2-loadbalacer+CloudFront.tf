@@ -6,19 +6,16 @@ module "alb_ecs" {
   vpc_id      = module.vpc.vpc_id
   subnets     = module.vpc.public_subnets
 
-  # ✅ Attach both SGs: existing ALB SG + CloudFront ingress SG
+  # ✅ Attach both SGs
   security_groups = [
-    # aws_security_group.alb_sg.id,
-    aws_security_group.alb_cf_ingress.id
+    aws_security_group.alb_https_sg.id,
+    aws_security_group.alb_8080_sg.id
   ]
 
   enable_deletion_protection = false
   create_security_group      = false
+  ip_address_type            = "ipv4"
 
-  # 👇 Disable dualstack (IPv4 only to avoid IPv6 CIDR errors)
-  ip_address_type = "ipv4"
-
-  # 👇 HTTPS listener with certificate
   listeners = {
     https = {
       port            = 443
@@ -38,9 +35,7 @@ module "alb_ecs" {
             target_group_key = "tg-1"
           }]
           conditions = [{
-            path_pattern = {
-              values = ["/app1*"]
-            }
+            path_pattern = { values = ["/app1*"] }
           }]
         }
 
@@ -51,9 +46,7 @@ module "alb_ecs" {
             target_group_key = "tg-2"
           }]
           conditions = [{
-            path_pattern = {
-              values = ["/app2*"]
-            }
+            path_pattern = { values = ["/app2*"] }
           }]
         }
 
@@ -64,77 +57,62 @@ module "alb_ecs" {
             target_group_key = "tg-3"
           }]
           conditions = [{
-            path_pattern = {
-              values = ["/app3/*"]
-            }
+            path_pattern = { values = ["/app3/*"] }
           }]
         }
       }
     }
   }
 
-  # 👇 Target groups and health checks
   target_groups = {
     tg-1 = {
-      protocol                          = "HTTP"
-      port                              = 80
-      target_type                       = "ip"
-      deregistration_delay              = 10
-      load_balancing_cross_zone_enabled = false
-      create_attachment                 = false
+      protocol            = "HTTP"
+      port                = 80
+      target_type         = "ip"
+      create_attachment   = false
+      deregistration_delay = 10
 
       health_check = {
-        enabled             = true
-        interval            = 30
-        path                = "/app1/"
-        port                = 80
-        healthy_threshold   = 3
-        unhealthy_threshold = 3
-        timeout             = 6
-        protocol            = "HTTP"
-        matcher             = "200-399"
+        enabled   = true
+        interval  = 30
+        path      = "/app1/"
+        port      = 80
+        protocol  = "HTTP"
+        matcher   = "200-399"
       }
     }
 
     tg-2 = {
-      protocol                          = "HTTP"
-      port                              = 80
-      target_type                       = "ip"
-      deregistration_delay              = 10
-      load_balancing_cross_zone_enabled = false
-      create_attachment                 = false
+      protocol            = "HTTP"
+      port                = 80
+      target_type         = "ip"
+      create_attachment   = false
+      deregistration_delay = 10
 
       health_check = {
-        enabled             = true
-        interval            = 30
-        path                = "/app2/"
-        port                = 80
-        healthy_threshold   = 3
-        unhealthy_threshold = 3
-        timeout             = 6
-        protocol            = "HTTP"
-        matcher             = "200-399"
+        enabled   = true
+        interval  = 30
+        path      = "/app2/"
+        port      = 80
+        protocol  = "HTTP"
+        matcher   = "200-399"
       }
     }
 
     tg-3 = {
-      protocol                          = "HTTP"
-      port                              = 8080
-      target_type                       = "ip"
-      deregistration_delay              = 10
-      load_balancing_cross_zone_enabled = false
-      create_attachment                 = false
+      protocol            = "HTTP"
+      port                = 8080
+      target_type         = "ip"
+      create_attachment   = false
+      deregistration_delay = 10
 
       health_check = {
-        enabled             = true
-        interval            = 30
-        path                = "/login"
-        port                = 8080
-        healthy_threshold   = 3
-        unhealthy_threshold = 3
-        timeout             = 10
-        protocol            = "HTTP"
-        matcher             = "200-399"
+        enabled   = true
+        interval  = 30
+        path      = "/login"
+        port      = 8080
+        protocol  = "HTTP"
+        matcher   = "200-399"
       }
     }
   }
