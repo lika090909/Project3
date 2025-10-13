@@ -2,12 +2,21 @@ module "alb_ecs" {
   source  = "terraform-aws-modules/alb/aws"
   version = "9.17.0"
 
-  name                       = "${var.environment}-ALB-ECS"
-  vpc_id                     = module.vpc.vpc_id
-  subnets                    = module.vpc.public_subnets
-  security_groups            = [module.alb_SG.security_group_id]
+  name        = "${var.environment}-ALB-ECS"
+  vpc_id      = module.vpc.vpc_id
+  subnets     = module.vpc.public_subnets
+
+  # ✅ Attach both SGs: existing ALB SG + CloudFront ingress SG
+  security_groups = [
+    # aws_security_group.alb_sg.id,
+    aws_security_group.alb_cf_ingress.id
+  ]
+
   enable_deletion_protection = false
   create_security_group      = false
+
+  # 👇 Disable dualstack (IPv4 only to avoid IPv6 CIDR errors)
+  ip_address_type = "ipv4"
 
   # 👇 HTTPS listener with certificate
   listeners = {
@@ -15,7 +24,7 @@ module "alb_ecs" {
       port            = 443
       protocol        = "HTTPS"
       ssl_policy      = "ELBSecurityPolicy-TLS13-1-2-Res-2021-06"
-      certificate_arn = data.aws_acm_certificate.issued.arn  # 👈 required for HTTPS
+      certificate_arn = data.aws_acm_certificate.issued.arn
 
       forward = {
         target_group_key = "tg-3"
