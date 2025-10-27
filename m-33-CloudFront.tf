@@ -1,10 +1,10 @@
+#######################################
+# CloudFront Distribution
+#######################################
 resource "aws_cloudfront_distribution" "alb_origin" {
   enabled         = true
   is_ipv6_enabled = true
   aliases         = ["lalalalalalala7.com"]
-
-  # 🧰 optional: attach WAF later
-  # web_acl_id = aws_wafv2_web_acl.cf_waf.arn  
 
   origin {
     domain_name = module.alb_ecs.dns_name
@@ -17,11 +17,11 @@ resource "aws_cloudfront_distribution" "alb_origin" {
       origin_ssl_protocols   = ["TLSv1.2"]
     }
 
-    # 👇 ✅ Add custom security header for ALB validation
-  #   origin_custom_header {
-  #     name  = "X-Origin-Secret"
-  #     value = var.cloudfront_origin_secret
-  #   }
+    # 🔐 Optional — if you want extra security between CF and ALB
+    # origin_custom_header {
+    #   name  = "X-Origin-Secret"
+    #   value = var.cloudfront_origin_secret
+    # }
   }
 
   default_cache_behavior {
@@ -31,8 +31,9 @@ resource "aws_cloudfront_distribution" "alb_origin" {
     allowed_methods  = ["GET", "HEAD", "OPTIONS", "PUT", "POST", "PATCH", "DELETE"]
     cached_methods   = ["GET", "HEAD"]
 
+    # ⚡ No caching, just pass through
     cache_policy_id          = aws_cloudfront_cache_policy.no_cache.id
-    origin_request_policy_id = aws_cloudfront_origin_request_policy.all_viewer_with_auth.id
+    origin_request_policy_id = aws_cloudfront_origin_request_policy.all_viewer_simple.id
 
     function_association {
       event_type   = "viewer-request"
@@ -55,4 +56,75 @@ resource "aws_cloudfront_distribution" "alb_origin" {
   }
 
   wait_for_deployment = true
+}
+
+#######################################
+# Origin Request Policy
+#######################################
+resource "aws_cloudfront_origin_request_policy" "all_viewer_simple" {
+  name = "AllViewerSimple"
+
+  headers_config {
+    header_behavior = "whitelist"
+    headers {
+      items = ["Host"]
+    }
+  }
+
+  cookies_config {
+    cookie_behavior = "all"
+  }
+
+  query_strings_config {
+    query_string_behavior = "all"
+  }
+}
+
+#######################################
+# No Cache Policy (valid)
+#######################################
+resource "aws_cloudfront_cache_policy" "no_cache" {
+  name = "no-cache-policy"
+
+  default_ttl = 0
+  max_ttl     = 0
+  min_ttl     = 0
+
+  parameters_in_cache_key_and_forwarded_to_origin {
+    headers_config {
+      header_behavior = "none"
+    }
+
+    # ❌ No cookies in cache policy (they’re forwarded via origin request policy)
+    cookies_config {
+      cookie_behavior = "none"
+    }
+
+    query_strings_config {
+      query_string_behavior = "none"
+    }
+  }
+}
+
+#######################################
+# Redirect Function
+#######################################
+resource "aws_cloudfront_function" "redirect_root" {
+  name    = "redirect-root-to-login"
+  runtime = "cloudfront-js-1.0"
+  comment = "Redirect / to /login"
+
+  code = <<-EOF
+    function handler(event) {
+      var request = event.request;
+      if (request.uri === '/' || request.uri === '') {
+        return {
+          statusCode: 301,
+          statusDescription: 'Moved Permanently',
+          headers: { 'location': { value: '/login' } }
+        };
+      }
+      return request;
+    }
+  EOF
 }

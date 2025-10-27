@@ -6,7 +6,6 @@ module "alb_ecs" {
   vpc_id      = module.vpc.vpc_id
   subnets     = module.vpc.public_subnets
 
-  # ✅ Attach both SGs
   security_groups = [
     aws_security_group.alb_https_sg.id,
     aws_security_group.alb_8080_sg.id
@@ -116,6 +115,4 @@ module "alb_ecs" {
       }
     }
   }
-
-  tags = local.common_tags
 }
