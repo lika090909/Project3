@@ -6,10 +6,10 @@ locals {
 }
 
 #######################################
-# ALB SG — HTTPS
+# ALB Security Group — HTTPS
 #######################################
-resource "aws_security_group" "alb_https_sg" {
-  name        = "alb-https-sg"
+resource "aws_security_group" "alb_http_sg" {
+  name        = "alb-http-sg"
   description = "Allow HTTPS from CloudFront"
   vpc_id      = module.vpc.vpc_id
 }
@@ -20,7 +20,7 @@ resource "aws_security_group_rule" "alb_https_ingress_cf" {
   to_port           = 443
   protocol          = "tcp"
   prefix_list_ids   = [local.cloudfront_ipv4_prefix_list_id]
-  security_group_id = aws_security_group.alb_https_sg.id
+  security_group_id = aws_security_group.alb_http_sg.id
 }
 
 resource "aws_security_group_rule" "alb_https_egress" {
@@ -30,11 +30,11 @@ resource "aws_security_group_rule" "alb_https_egress" {
   protocol          = "-1"
   cidr_blocks       = ["0.0.0.0/0"]
   ipv6_cidr_blocks  = ["::/0"]
-  security_group_id = aws_security_group.alb_https_sg.id
+  security_group_id = aws_security_group.alb_http_sg.id
 }
 
 #######################################
-# ALB SG — 8080 (App3)
+# ALB Security Group — 8080 (App3)
 #######################################
 resource "aws_security_group" "alb_8080_sg" {
   name        = "alb-8080-sg"

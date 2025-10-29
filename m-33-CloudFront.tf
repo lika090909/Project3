@@ -16,22 +16,14 @@ resource "aws_cloudfront_distribution" "alb_origin" {
       https_port             = 443
       origin_ssl_protocols   = ["TLSv1.2"]
     }
-
-    # 🔐 Optional — if you want extra security between CF and ALB
-    # origin_custom_header {
-    #   name  = "X-Origin-Secret"
-    #   value = var.cloudfront_origin_secret
-    # }
   }
 
   default_cache_behavior {
     target_origin_id       = "alb-origin"
     viewer_protocol_policy = "redirect-to-https"
+    allowed_methods        = ["GET", "HEAD", "OPTIONS", "PUT", "POST", "PATCH", "DELETE"]
+    cached_methods         = ["GET", "HEAD"]
 
-    allowed_methods  = ["GET", "HEAD", "OPTIONS", "PUT", "POST", "PATCH", "DELETE"]
-    cached_methods   = ["GET", "HEAD"]
-
-    # ⚡ No caching, just pass through
     cache_policy_id          = aws_cloudfront_cache_policy.no_cache.id
     origin_request_policy_id = aws_cloudfront_origin_request_policy.all_viewer_simple.id
 
@@ -81,11 +73,10 @@ resource "aws_cloudfront_origin_request_policy" "all_viewer_simple" {
 }
 
 #######################################
-# No Cache Policy (valid)
+# No Cache Policy
 #######################################
 resource "aws_cloudfront_cache_policy" "no_cache" {
   name = "no-cache-policy"
-
   default_ttl = 0
   max_ttl     = 0
   min_ttl     = 0
@@ -94,12 +85,9 @@ resource "aws_cloudfront_cache_policy" "no_cache" {
     headers_config {
       header_behavior = "none"
     }
-
-    # ❌ No cookies in cache policy (they’re forwarded via origin request policy)
     cookies_config {
       cookie_behavior = "none"
     }
-
     query_strings_config {
       query_string_behavior = "none"
     }
