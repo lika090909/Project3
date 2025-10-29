@@ -1,3 +1,7 @@
+#######################################
+# ALB Module — HTTPS Listener + Path Rules
+#######################################
+# TEST SAVE OCT29
 module "alb_ecs" {
   source  = "terraform-aws-modules/alb/aws"
   version = "9.17.0"
@@ -7,7 +11,7 @@ module "alb_ecs" {
   subnets     = module.vpc.public_subnets
 
   security_groups = [
-    aws_security_group.alb_https_sg.id,
+    aws_security_group.alb_http_sg.id,
     aws_security_group.alb_8080_sg.id
   ]
 
@@ -27,6 +31,17 @@ module "alb_ecs" {
       }
 
       rules = {
+        login-path-rule = {
+          priority = 5
+          actions = [{
+            type             = "forward"
+            target_group_key = "tg-3"
+          }]
+          conditions = [{
+            path_pattern = { values = ["/login", "/login/*"] }
+          }]
+        }
+
         app1-path-rule = {
           priority = 10
           actions = [{
@@ -49,26 +64,28 @@ module "alb_ecs" {
           }]
         }
 
-        app3-path-rule = {
-          priority = 27
+        app2-path-rule = {
+          priority = 25
           actions = [{
             type             = "forward"
-            target_group_key = "tg-3"
+            target_group_key = "tg-2"
           }]
           conditions = [{
-            path_pattern = { values = ["/app3/*"] }
+            path_pattern = { values = ["/app2*"] }
           }]
         }
+      EBAAAAAT
+        
       }
     }
-  }
+  } 
 
   target_groups = {
     tg-1 = {
-      protocol            = "HTTP"
-      port                = 80
-      target_type         = "ip"
-      create_attachment   = false
+      protocol             = "HTTP"
+      port                 = 80
+      target_type          = "ip"
+      create_attachment    = false
       deregistration_delay = 10
 
       health_check = {
@@ -82,10 +99,10 @@ module "alb_ecs" {
     }
 
     tg-2 = {
-      protocol            = "HTTP"
-      port                = 80
-      target_type         = "ip"
-      create_attachment   = false
+      protocol             = "HTTP"
+      port                 = 80
+      target_type          = "ip"
+      create_attachment    = false
       deregistration_delay = 10
 
       health_check = {
@@ -99,10 +116,10 @@ module "alb_ecs" {
     }
 
     tg-3 = {
-      protocol            = "HTTP"
-      port                = 8080
-      target_type         = "ip"
-      create_attachment   = false
+      protocol             = "HTTP"
+      port                 = 8080
+      target_type          = "ip"
+      create_attachment    = false
       deregistration_delay = 10
 
       health_check = {
@@ -116,3 +133,5 @@ module "alb_ecs" {
     }
   }
 }
+
+
