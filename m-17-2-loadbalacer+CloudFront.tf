@@ -1,7 +1,7 @@
 #######################################
 # ALB Module — HTTPS Listener + Path Rules
 #######################################
-# TEST SAVE OCT29
+
 module "alb_ecs" {
   source  = "terraform-aws-modules/alb/aws"
   version = "9.17.0"
@@ -74,7 +74,6 @@ module "alb_ecs" {
             path_pattern = { values = ["/app2*"] }
           }]
         }
-      EBAAAAAT
         
       }
     }
