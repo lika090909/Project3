@@ -63,17 +63,6 @@ module "alb_ecs" {
             path_pattern = { values = ["/app2*"] }
           }]
         }
-
-        app2-path-rule = {
-          priority = 25
-          actions = [{
-            type             = "forward"
-            target_group_key = "tg-2"
-          }]
-          conditions = [{
-            path_pattern = { values = ["/app2*"] }
-          }]
-        }
         
       }
     }

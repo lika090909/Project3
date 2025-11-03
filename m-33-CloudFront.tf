@@ -21,16 +21,16 @@ resource "aws_cloudfront_distribution" "alb_origin" {
   default_cache_behavior {
     target_origin_id       = "alb-origin"
     viewer_protocol_policy = "redirect-to-https"
-    allowed_methods        = ["GET", "HEAD", "OPTIONS", "PUT", "POST", "PATCH", "DELETE"]
-    cached_methods         = ["GET", "HEAD"]
+
+    allowed_methods = [
+      "GET", "HEAD", "OPTIONS", "PUT", "POST", "PATCH", "DELETE"
+    ]
+    cached_methods = ["GET", "HEAD"]
 
     cache_policy_id          = aws_cloudfront_cache_policy.no_cache.id
     origin_request_policy_id = aws_cloudfront_origin_request_policy.all_viewer_simple.id
 
-    function_association {
-      event_type   = "viewer-request"
-      function_arn = aws_cloudfront_function.redirect_root.arn
-    }
+    compress = true
   }
 
   restrictions {
@@ -51,20 +51,20 @@ resource "aws_cloudfront_distribution" "alb_origin" {
 }
 
 #######################################
-# Origin Request Policy
+# Origin Request Policy — forward all cookies
 #######################################
 resource "aws_cloudfront_origin_request_policy" "all_viewer_simple" {
-  name = "AllViewerSimple"
+  name = "AllViewerSimple-SessionForward"
+
+  cookies_config {
+    cookie_behavior = "all"
+  }
 
   headers_config {
     header_behavior = "whitelist"
     headers {
-      items = ["Host"]
+      items = ["Host", "Origin", "Referer"]
     }
-  }
-
-  cookies_config {
-    cookie_behavior = "all"
   }
 
   query_strings_config {
@@ -73,10 +73,10 @@ resource "aws_cloudfront_origin_request_policy" "all_viewer_simple" {
 }
 
 #######################################
-# No Cache Policy
+# No Cache Policy — disables caching completely
 #######################################
 resource "aws_cloudfront_cache_policy" "no_cache" {
-  name = "no-cache-policy"
+  name        = "no-cache-policy"
   default_ttl = 0
   max_ttl     = 0
   min_ttl     = 0
@@ -85,34 +85,13 @@ resource "aws_cloudfront_cache_policy" "no_cache" {
     headers_config {
       header_behavior = "none"
     }
+
     cookies_config {
       cookie_behavior = "none"
     }
+
     query_strings_config {
       query_string_behavior = "none"
     }
   }
-}
-
-#######################################
-# Redirect Function
-#######################################
-resource "aws_cloudfront_function" "redirect_root" {
-  name    = "redirect-root-to-login"
-  runtime = "cloudfront-js-1.0"
-  comment = "Redirect / to /login"
-
-  code = <<-EOF
-    function handler(event) {
-      var request = event.request;
-      if (request.uri === '/' || request.uri === '') {
-        return {
-          statusCode: 301,
-          statusDescription: 'Moved Permanently',
-          headers: { 'location': { value: '/login' } }
-        };
-      }
-      return request;
-    }
-  EOF
 }
