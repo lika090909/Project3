@@ -6,23 +6,34 @@ locals {
 }
 
 #######################################
-# ALB Security Group — HTTPS
+# ALB Security Group — HTTPS (443)
 #######################################
 resource "aws_security_group" "alb_http_sg" {
   name        = "alb-http-sg"
   description = "Allow HTTPS from CloudFront"
   vpc_id      = module.vpc.vpc_id
+
+  lifecycle {
+    ignore_changes = [name, description, tags]
+  }
+
+  tags = {
+    Name = "${var.environment}-alb-http-sg"
+  }
 }
 
+# Allow HTTPS from CloudFront edge nodes
 resource "aws_security_group_rule" "alb_https_ingress_cf" {
   type              = "ingress"
   from_port         = 443
   to_port           = 443
   protocol          = "tcp"
   prefix_list_ids   = [local.cloudfront_ipv4_prefix_list_id]
+  description       = "Allow HTTPS from CloudFront"
   security_group_id = aws_security_group.alb_http_sg.id
 }
 
+# Allow all outbound traffic
 resource "aws_security_group_rule" "alb_https_egress" {
   type              = "egress"
   from_port         = 0
@@ -30,6 +41,7 @@ resource "aws_security_group_rule" "alb_https_egress" {
   protocol          = "-1"
   cidr_blocks       = ["0.0.0.0/0"]
   ipv6_cidr_blocks  = ["::/0"]
+  description       = "Allow all outbound"
   security_group_id = aws_security_group.alb_http_sg.id
 }
 
@@ -40,17 +52,28 @@ resource "aws_security_group" "alb_8080_sg" {
   name        = "alb-8080-sg"
   description = "Allow 8080 from CloudFront"
   vpc_id      = module.vpc.vpc_id
+
+  lifecycle {
+    ignore_changes = [name, description, tags]
+  }
+
+  tags = {
+    Name = "${var.environment}-alb-8080-sg"
+  }
 }
 
+# Allow 8080 from CloudFront edge nodes
 resource "aws_security_group_rule" "alb_8080_ingress_cf" {
   type              = "ingress"
   from_port         = 8080
   to_port           = 8080
   protocol          = "tcp"
   prefix_list_ids   = [local.cloudfront_ipv4_prefix_list_id]
+  description       = "Allow 8080 from CloudFront"
   security_group_id = aws_security_group.alb_8080_sg.id
 }
 
+# Allow all outbound
 resource "aws_security_group_rule" "alb_8080_egress" {
   type              = "egress"
   from_port         = 0
@@ -58,5 +81,6 @@ resource "aws_security_group_rule" "alb_8080_egress" {
   protocol          = "-1"
   cidr_blocks       = ["0.0.0.0/0"]
   ipv6_cidr_blocks  = ["::/0"]
+  description       = "Allow all outbound"
   security_group_id = aws_security_group.alb_8080_sg.id
 }

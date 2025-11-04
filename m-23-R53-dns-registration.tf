@@ -12,9 +12,11 @@ resource "aws_route53_record" "apex_to_cf" {
 }
 
 
+
 # resource "aws_route53_record" "R53_registration_with_www" {
 #   zone_id = data.aws_route53_zone.mydomain.zone_id
-#   name    = var.domain_name
+#   # name    = var.domain_name
+#   name    = "lalalalalalala7.com"
 #   type    = "A"
 #   alias {
 #     name                   = module.alb_ecs.dns_name
